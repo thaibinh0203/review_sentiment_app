@@ -1,7 +1,9 @@
+import os, nltk
+nltk.data.path.append(os.environ.get("NLTK_DATA", "/opt/render/nltk_data"))
+from nltk.corpus import stopwords
 import numpy as np
 import re
 from bs4 import BeautifulSoup
-import nltk
 from nltk.corpus import stopwords
 def clean_text(text):
     # 2.1 Xóa HTML bằng BeautifulSoup (chính xác hơn Regex)

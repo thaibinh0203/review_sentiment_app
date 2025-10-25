@@ -65,12 +65,3 @@ class ReviewService():
             scores = np.ravel(self.model.decision_function(X)).astype(float)
 
         return pd.DataFrame({"review": X, "pred": labels, "score": scores})
-if __name__ == "__main__":
-    test_request = ReviewRequest(text=[
-    "A very accurate depiction of small time mob life...",
-    "good movie"
-])
-
-    rs = ReviewService()
-    df = rs.predict_table(test_request.as_list())
-    print(df)   # bảng: review | pred | score
