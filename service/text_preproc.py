@@ -1,10 +1,9 @@
-import os, nltk
-nltk.data.path.append(os.environ.get("NLTK_DATA", "/opt/render/nltk_data"))
-from nltk.corpus import stopwords
+
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 import numpy as np
 import re
 from bs4 import BeautifulSoup
-from nltk.corpus import stopwords
+import nltk
 def clean_text(text):
     # 2.1 Xóa HTML bằng BeautifulSoup (chính xác hơn Regex)
     text = BeautifulSoup(text, "html.parser").get_text()
@@ -23,7 +22,7 @@ def clean_text(text):
 
     # 2.6 Xóa stopwords (bao gồm cả tiếng Anh + tiếng Việt tự thêm vào)
    # stopwords tiếng Anh gốc
-    stop_words = set(stopwords.words('english'))
+    stop_words = set(ENGLISH_STOP_WORDS)
 
     # *** GIỮ LẠI CÁC TỪ PHỦ ĐỊNH ***
     neg_keep = {

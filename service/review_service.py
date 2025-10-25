@@ -8,7 +8,6 @@ import os # Xử lí file
 import pandas as pd # thư viện đọc file
 from bs4 import BeautifulSoup               # Dùng để xóa HTML
 import nltk
-from nltk.corpus import stopwords     # Danh sách stopwords có sẵn
 from typing import List, Union
 from sklearn.svm import LinearSVC
 from sklearn.model_selection import GridSearchCV, StratifiedKFold, learning_curve
