@@ -22,6 +22,10 @@ from domain.domain import ReviewRequest, ReviewResponse
 import numpy as np
 from scipy import sparse
 from service.text_preproc import _clean_batch  # hàm đúng như khi train
+import sys, types
+if "__main__" not in sys.modules:
+    sys.modules["__main__"] = types.ModuleType("__main__")
+setattr(sys.modules["__main__"], "_clean_batch", _clean_batch)
 import __main__      
 # gắn tên hàm vào __main__ để pickle tìm thấy
 __main__._clean_batch = _clean_batch
