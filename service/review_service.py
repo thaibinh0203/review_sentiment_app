@@ -68,3 +68,29 @@ class ReviewService():
             scores = np.ravel(self.model.decision_function(X)).astype(float)
 
         return pd.DataFrame({"review": X, "pred": labels, "score": scores})
+    def predict_stt_pred_score(self, stt_and_text: list[tuple[str, str]], threshold: float = 0.5) -> pd.DataFrame:
+        """
+        Input : list[(stt, text)]
+        Output: DataFrame gồm: stt, pred, score
+        - pred  : 'positive' hoặc 'negative' theo threshold
+        - score : p(positive) từ predict_proba (LogisticRegression, v.v.)
+        """
+        if not hasattr(self.model, "predict_proba"):
+            raise RuntimeError(
+                "Model không có predict_proba. Hãy dùng classifier hỗ trợ proba (vd: LogisticRegression)."
+            )
+
+        stts  = [s for s, _ in stt_and_text]
+        texts = [t for _, t in stt_and_text]
+
+        idx_pos = self._positive_col(1)  # tìm cột 'positive' trong classes_
+        proba   = self.model.predict_proba(texts).astype(float)
+        p_pos   = proba[:, idx_pos]
+
+        preds = np.where(p_pos >= threshold, "positive", "negative")
+
+        return pd.DataFrame({
+            "stt":   stts,
+            "pred":  preds,
+            "score": p_pos,     # chỉ 1 score: xác suất positive
+        })
