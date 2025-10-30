@@ -69,7 +69,30 @@ if analyse:
                 # Hiển thị kết quả
                 st.success("✅ Phân tích thành công!")
                 st.dataframe(df_result[["stt", "review", "pred", "score"]])
+                if "pred" in df_result.columns:
+                    counts = df_result["pred"].str.lower().value_counts(dropna=False)
+                    pos = int(counts.get("positive", 0))
+                    neg = int(counts.get("negative", 0))
+            
+                    total = len(df_result)
+                    pos_rate = pos / total if total else 0.0
+                    neg_rate = neg / total if total else 0.0
+        
 
+                    st.markdown("### 📊 Tổng kết")
+                    c1, c2, c3, c4 = st.columns(4)
+                    c1.metric("Tổng review", f"{total}")
+                    c2.metric("Positive", f"{pos}", f"{pos_rate:.1%}")
+                    c3.metric("Negative", f"{neg}", f"{neg_rate:.1%}")
+                    st.write(
+                        pd.DataFrame(
+                            {
+                                "label": ["positive", "negative", "neutral"],
+                                "count": [pos, neg],
+                                "ratio": [f"{pos_rate:.2%}", f"{neg_rate:.2%}"],
+                            }
+                        )
+                    )
                 # Tải xuống kết quả
                 csv = df_result.to_csv(index=False).encode("utf-8")
                 st.download_button(
