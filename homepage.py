@@ -110,7 +110,8 @@ st.markdown("""
 
 # Navigation Bar
 header_cols = st.columns([2, 1, 1])
-BASE_DIR = Path(__file__).resolve().parent
+import os
+BASE_DIR = Path(os.getcwd())
 poster_dir = BASE_DIR / "images"
 with header_cols[0]:
     try:
