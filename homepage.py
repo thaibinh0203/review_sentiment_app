@@ -111,6 +111,8 @@ st.markdown("""
 # Navigation Bar
 header_cols = st.columns([2, 1, 1])
 import os
+from pathlib import Path
+
 BASE_DIR = Path(os.getcwd())
 poster_dir = BASE_DIR / "images"
 with header_cols[0]:
@@ -293,6 +295,7 @@ with bot_col1:
 with bot_col2:
     if st.button("Find your next movies", key="bot2"):
         st.toast("Finding...")
+
 
 
 
