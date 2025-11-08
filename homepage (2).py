@@ -287,7 +287,7 @@ _, bot_col1, bot_col2, _ = st.columns([1.5, 1, 1, 1.5])
 with bot_col1:
     if st.button("Start analyzing your movie", key="bot1"):
         st.toast("Starting...")
-        st.switch_page("pages/ui.py")   #Để file py trang tiếp theo vào folder tên pages
+        st.link_button("Open App", "https://review-sentiment-app.streamlit.app")
 
 with bot_col2:
     if st.button("Find your next movies", key="bot2"):
