@@ -17,38 +17,12 @@ with col_img:
         st.error(f"Không tìm thấy logo: {logo_path}")
 
 with col1:
-    st.markdown("""
-        <div style="text-align:center;">
-            <button style="
-                background-color:#D8FF84;
-                border:2px solid #1A1A1A;
-                border-radius:10px;
-                padding:10px 20px;
-                font-family:'Courier Prime', monospace;
-                font-weight:700;
-                font-size:40px;
-                box-shadow:3px 3px 0px #FFD6E0;">
-                Analyze Movies
-            </button>
-        </div>
-    """, unsafe_allow_html=True)
+    if st.button("Homepage", use_container_width=True):
+        st.switch_page("homepage.py")            
 
 with col2:
-    st.markdown("""
-        <div style="text-align:center;">
-            <button style="
-                background-color:#D8FF84;
-                border:2px solid #1A1A1A;
-                border-radius:10px;
-                padding:10px 20px;
-                font-family:'Courier Prime', monospace;
-                font-weight:700;
-                font-size:40px;
-                box-shadow:3px 3px 0px #FFD6E0;">
-                Movies Recomendations
-            </button>
-        </div>
-    """, unsafe_allow_html=True)
+    if st.button("Movies Recommendations", use_container_width=True):
+        st.switch_page("pages/recommendations.py") 
 
 st.markdown("""
     <style>
