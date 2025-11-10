@@ -1,14 +1,13 @@
 import streamlit as st
-import pickle
 import pandas as pd
 import requests
 from pathlib import Path
 
 # ===================== PATH & KEYS ======================
 LOGO_PATH = Path("images/LOGO.jpg")
-PKL_PATH  = Path("artifacts/movie_data.pkl")   # LOCAL artifacts
+MOVIES_CSV  = "data/tmdb_5000_movies.csv"
+CREDITS_CSV = "data/tmdb_5000_credits.csv"
 
-# (local test có thể dùng hardcode; khi deploy hãy chuyển sang secrets)
 TMDB_API_KEY = "32be515044e4f084aa5b020364d6e780"
 
 # ===================== PAGE CONFIG ======================
@@ -31,7 +30,7 @@ st.markdown("""
 .header-wrap{ display:flex; align-items:center; justify-content:space-between; gap:24px; }
 .brand{ display:flex; align-items:center; gap:18px; }
 
-/* Cặp nút ở giữa (như ảnh) */
+/* Cặp nút ở giữa */
 .top-cta{
   display:flex; justify-content:center; gap:28px;
   margin:10px 0 6px;
@@ -80,15 +79,27 @@ div[data-testid="stVerticalBlock"] button:hover{ transform:scale(1.03); }
 </style>
 """, unsafe_allow_html=True)
 
-
-# ===================== LOAD MODEL =======================
+# ===================== LOAD FROM CSV (no PKL) =======================
 @st.cache_resource(show_spinner=True)
-def load_movie_pkl(pkl_path: Path):
-    with open(pkl_path, "rb") as f:
-        movies, cosine_sim = pickle.load(f)
-    return movies.copy(), cosine_sim
+def load_from_csv(movies_csv: str, credits_csv: str):
+    import numpy as np
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import linear_kernel
 
-movies, cosine_sim = load_movie_pkl(PKL_PATH)
+    m = pd.read_csv(movies_csv)
+    c = pd.read_csv(credits_csv)
+    df = m.merge(c, on="title")
+    df["movie_id"] = df["id"]                 # alias dùng cho TMDB
+    overview = df["overview"].fillna("")
+
+    tfidf = TfidfVectorizer(stop_words="english")
+    tfidf_matrix = tfidf.fit_transform(overview)
+    cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix).astype("float32")
+
+    movies_small = df[["title", "movie_id"]].reset_index(drop=True)
+    return movies_small, cosine_sim
+
+movies, cosine_sim = load_from_csv(MOVIES_CSV, CREDITS_CSV)
 movie_titles = movies["title"].tolist()
 
 # ===================== TMDB POSTER ======================
@@ -118,20 +129,39 @@ st.markdown('<div class="header-wrap">', unsafe_allow_html=True)
 st.markdown('<div class="brand">', unsafe_allow_html=True)
 if LOGO_PATH.exists():
     st.image(str(LOGO_PATH), width=140)
-st.markdown('</div></div>', unsafe_allow_html=True)  # đóng brand + header-wrap
+st.markdown('</div></div>', unsafe_allow_html=True)
 
 # ===== 2 NÚT Ở GIỮA (trang trí) =====
-st.markdown(
-    '<div class="top-cta">'
-    '<a class="btn-pill" href="#">Analyze Movies</a>'
-    '<a class="btn-pill" href="#">Movie Recommendations</a>'
-    '</div>',
-    unsafe_allow_html=True
-)
+col1, col2 = st.columns([2, 2])
+st.markdown("""
+<style>
+div[data-testid="stButton"] > button {
+    background-color:#D8FF84;
+    border:3px solid #1A1A1A;
+    border-radius:12px;
+    padding:12px 20px;
+    font-family:'Courier Prime', monospace;
+    font-weight:700;
+    font-size:24px;
+    box-shadow:6px 6px 0px #FFD6E0;
+    color:#1A1A1A;
+}
+div[data-testid="stButton"] > button:hover {
+    background-color:#E8FF9A;
+}
+</style>
+""", unsafe_allow_html=True)
+
+with col1:
+    if st.button("Homepage", use_container_width=True):
+        st.switch_page("homepage.py")            
+
+with col2:
+    if st.button("Analyze Movies", use_container_width=True):
+        st.switch_page("pages/review.py") 
 
 # ===== TITLE =====
 st.markdown('<h1 class="hero">Your <span class="hi">next</span> movie</h1>', unsafe_allow_html=True)
-
 
 # ===================== INPUT + BUTTON ===================
 c1, cbtn, _ = st.columns([6, 2, 1])
