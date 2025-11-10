@@ -140,10 +140,21 @@ def fetch_poster(movie_id):
     p = data.get("poster_path")
     return f"https://image.tmdb.org/t/p/w500{p}" if p else None
 
-def recommend(title):
-    index = movies[movies["title"]==title].index[0]
-    distances = sorted(list(enumerate(similarity[index])),reverse=True,key=lambda x:x[1])
-    return distances[1:11]
+def recommend(title, top_k=10):
+    # vị trí phim được chọn
+    index = movies[movies["title"] == title].index[0]
+    # sắp xếp theo độ tương tự giảm dần
+    distances = sorted(
+        list(enumerate(similarity[index])),
+        reverse=True,
+        key=lambda x: x[1]
+    )
+    # bỏ phần tử đầu tiên (chính nó), lấy top_k tiếp theo
+    picks = []
+    for i, _score in distances[1: top_k + 1]:
+        row = movies.iloc[i]
+        picks.append((row["title"], row["movie_id"]))
+    return picks
 
 # ===== HEADER: chỉ logo bên trái =====
 st.markdown('<div class="header-wrap">', unsafe_allow_html=True)
@@ -187,7 +198,8 @@ st.markdown('<h1 class="hero">Your <span class="hi">next</span> movie</h1>', uns
 # ===================== INPUT + BUTTON ===================
 c1, cbtn, _ = st.columns([6, 2, 1])
 with c1:
-    selected = st.selectbox("", movie_titles, index=0)
+    # was: selected = st.selectbox("", movie_titles, index=0)
+    selected = st.selectbox("", all_titles, index=0)
 with cbtn:
     run = st.button("Recommend", use_container_width=True)
 
