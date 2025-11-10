@@ -103,26 +103,69 @@ movies, cosine_sim = load_from_csv(MOVIES_CSV, CREDITS_CSV)
 movie_titles = movies["title"].tolist()
 
 # ===================== TMDB POSTER ======================
-def fetch_poster(movie_id: int):
-    try:
-        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
-        data = requests.get(url, timeout=10).json()
-        p = data.get("poster_path")
-        return f"https://image.tmdb.org/t/p/w500{p}" if p else None
-    except Exception:
-        return None
+@st.cache_resource
+def load_data():
+    import ast
+    import numpy as np
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
 
-# ===================== RECOMMEND CORE ===================
-def recommend(movie: str, top_k: int = 10):
-    idx = movies.index[movies["title"] == movie]
-    if len(idx) == 0:
-        return []
-    base = int(idx[0])
-    sims = list(enumerate(cosine_sim[base]))
-    sims.sort(key=lambda x: x[1], reverse=True)
-    picked = [i for i, _ in sims[1: top_k+1]]
-    out = movies.loc[picked, ["title", "movie_id"]]
-    return list(out.itertuples(index=False, name=None))  # [(title, id), ...]
+    movies = pd.read_csv(MOVIES_CSV)
+    credits = pd.read_csv(CREDITS_CSV)
+
+    df = movies.merge(credits, on="title")
+
+    def convert(obj):
+        L = []
+        for i in ast.literal_eval(obj):
+            L.append(i["name"])
+        return L
+
+    df["genres"] = df["genres"].apply(convert)
+    df["keywords"] = df["keywords"].apply(convert)
+
+    def convert_cast(obj):
+        L = []
+        counter = 0
+        for i in ast.literal_eval(obj):
+            if counter < 3:
+                L.append(i["name"])
+                counter += 1
+        return L
+
+    df["cast"] = df["cast"].apply(convert_cast)
+
+    def get_director(obj):
+        for i in ast.literal_eval(obj):
+            if i["job"] == "Director":
+                return i["name"]
+        return ""
+        
+    df["crew"] = df["crew"].apply(lambda x: [get_director(x)])
+
+    df["tags"] = df["genres"] + df["keywords"] + df["cast"] + df["crew"]
+    df["tags"] = df["tags"].apply(lambda x: " ".join(x))
+    df = df[["movie_id","title","tags"]]
+
+    tfidf = TfidfVectorizer(stop_words="english")
+    vectors = tfidf.fit_transform(df["tags"])
+    similarity = cosine_similarity(vectors)
+
+    return df.reset_index(drop=True), similarity
+
+movies, similarity = load_data()
+all_titles = movies["title"].tolist()
+
+def fetch_poster(movie_id):
+    url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
+    data = requests.get(url).json()
+    p = data.get("poster_path")
+    return f"https://image.tmdb.org/t/p/w500{p}" if p else None
+
+def recommend(title):
+    index = movies[movies["title"]==title].index[0]
+    distances = sorted(list(enumerate(similarity[index])),reverse=True,key=lambda x:x[1])
+    return distances[1:11]
 
 # ===== HEADER: chỉ logo bên trái =====
 st.markdown('<div class="header-wrap">', unsafe_allow_html=True)
