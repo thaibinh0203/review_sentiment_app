@@ -79,28 +79,6 @@ div[data-testid="stVerticalBlock"] button:hover{ transform:scale(1.03); }
 </style>
 """, unsafe_allow_html=True)
 
-# ===================== LOAD FROM CSV (no PKL) =======================
-@st.cache_resource(show_spinner=True)
-def load_from_csv(movies_csv: str, credits_csv: str):
-    import numpy as np
-    from sklearn.feature_extraction.text import TfidfVectorizer
-    from sklearn.metrics.pairwise import linear_kernel
-
-    m = pd.read_csv(movies_csv)
-    c = pd.read_csv(credits_csv)
-    df = m.merge(c, on="title")
-    df["movie_id"] = df["id"]                 # alias dùng cho TMDB
-    overview = df["overview"].fillna("")
-
-    tfidf = TfidfVectorizer(stop_words="english")
-    tfidf_matrix = tfidf.fit_transform(overview)
-    cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix).astype("float32")
-
-    movies_small = df[["title", "movie_id"]].reset_index(drop=True)
-    return movies_small, cosine_sim
-
-movies, cosine_sim = load_from_csv(MOVIES_CSV, CREDITS_CSV)
-movie_titles = movies["title"].tolist()
 
 # ===================== TMDB POSTER ======================
 @st.cache_resource
