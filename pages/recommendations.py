@@ -37,48 +37,59 @@ with col_img:
         st.error(f"Không tìm thấy logo: {logo_path}")
 import streamlit as st
 
+import streamlit as st
+
+# === CSS Style để nút giống ảnh 2 ===
 st.markdown("""
 <style>
-/* Style chung cho 2 nút trong 2 cột đầu tiên */
-div[data-testid="column"]:nth-of-type(1) div[data-testid="stButton"] > button,
-div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] > button {
+/* Container 2 nút */
+.menu-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 10px;
+}
+
+/* Style nút */
+.menu-btn > button {
     background-color: var(--lime);
     border: 2px solid var(--ink);
     border-radius: 16px;
-    height: 60px;
     font-family: 'Courier Prime', monospace;
     font-weight: 700;
     font-size: 20px;
-    line-height: 20px;
+    padding: 18px 80px;
     box-shadow: 5px 5px 10px 1px var(--pink);
     cursor: pointer;
 }
 
-/* Căn giữa button trong từng cột */
-div[data-testid="column"] div[data-testid="stButton"] {
-    text-align: center;
-}
-
-/* Padding riêng cho từng nút để giống HTML cũ */
-div[data-testid="column"]:nth-of-type(1) div[data-testid="stButton"] > button {
-    padding: 10px 65px;   /* Homepage */
-}
-div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] > button {
-    padding: 10px 30px;   /* Analyze Movies */
+/* Hover effect (tùy chọn) */
+.menu-btn > button:hover {
+    transform: translateY(-2px);
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ---- Layout 2 cột + button điều hướng ----
-col1, col2 = st.columns(2)
+
+# === Layout giống ảnh 2 ===
+st.markdown('<div class="menu-container">', unsafe_allow_html=True)
+
+col1, col2 = st.columns([1, 1])
 
 with col1:
-    if st.button("Homepage", key="btn_homepage"):
-        st.switch_page("homepage.py")            
+    st.markdown('<div class="menu-btn">', unsafe_allow_html=True)
+    if st.button("Homepage", key="btn_home", use_container_width=True):
+        st.switch_page("homepage.py")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
-    if st.button("Analyze Movies", key="btn_analyze_movies"):
+    st.markdown('<div class="menu-btn">', unsafe_allow_html=True)
+    if st.button("Movies Recommendations", key="btn_rec", use_container_width=True):
         st.switch_page("pages/review.py")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 # ======= TITLE =======
