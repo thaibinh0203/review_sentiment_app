@@ -3,7 +3,7 @@ import streamlit as st
 # 1. CẤU HÌNH
 st.set_page_config(page_title = "Movie Homepage", layout = "wide")
 
-# 2. Font import
+# 2. THÊM FONT TỪ GOOGLE
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400..700;1,400..700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap');
@@ -106,15 +106,17 @@ st.markdown("""
             
 """, unsafe_allow_html = True)
 
-# 3. Web layout
+# 3. WEB LAYOUT
 
 # Navigation Bar
-header_cols = st.columns([2, 1, 1])
+header_cols = st.columns([2, 1, 1]) # Chia layout thành 3 cột
 import os
 from pathlib import Path
 
-BASE_DIR = Path(os.getcwd())
-poster_dir = BASE_DIR / "images"
+BASE_DIR = Path(os.getcwd()) # Lấy đường dẫn thư mục hiện tại
+poster_dir = BASE_DIR / "images" # Thư mục chứa ảnh
+
+# Hiển thị logo nếu tồn tại
 with header_cols[0]:
     try:
         st.image(str((poster_dir / "LOGO.jpg")), width=300)
@@ -138,7 +140,7 @@ rounded_box_css_new = """
     /* Phong cách chữ */
     color: #212121;              /* Màu chữ mặc định là XÁM ĐEN */
     font-size: 36px;             /* Tăng cỡ chữ */
-    font-family: monospace;      /* Chọn font monospace để code trông "techy" */
+    font-family: Baskervville, serif;
     text-align: center;
     font-weight: bold;
 }
@@ -280,11 +282,11 @@ html = f"""
 </style>
 """
 
-
+# Nhúng HTML vào Streamlit
 components.html(html, height=560, scrolling=False)
 
 
-# CTA
+# Nút chuyển trang (CTA)
 _, bot_col1, bot_col2, _ = st.columns([1.5, 1, 1, 1.5])
 
 with bot_col1:
