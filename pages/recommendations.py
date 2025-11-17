@@ -35,48 +35,51 @@ with col_img:
         st.image(str(logo_path), width=300)
     else:
         st.error(f"Không tìm thấy logo: {logo_path}")
+import streamlit as st
+
+st.markdown("""
+<style>
+/* Style chung cho 2 nút trong 2 cột đầu tiên */
+div[data-testid="column"]:nth-of-type(1) div[data-testid="stButton"] > button,
+div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] > button {
+    background-color: var(--lime);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    height: 60px;
+    font-family: 'Courier Prime', monospace;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 20px;
+    box-shadow: 5px 5px 10px 1px var(--pink);
+    cursor: pointer;
+}
+
+/* Căn giữa button trong từng cột */
+div[data-testid="column"] div[data-testid="stButton"] {
+    text-align: center;
+}
+
+/* Padding riêng cho từng nút để giống HTML cũ */
+div[data-testid="column"]:nth-of-type(1) div[data-testid="stButton"] > button {
+    padding: 10px 65px;   /* Homepage */
+}
+div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] > button {
+    padding: 10px 30px;   /* Analyze Movies */
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ---- Layout 2 cột + button điều hướng ----
+col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown("""
-    <div style="text-align:center;">
-        <a href="/homepage" target="_self">
-            <button style="
-                background-color:var(--lime);
-                border:2px solid var(--ink);
-                border-radius:16px;
-                height:60px;
-                padding:10px 65px;  
-                font-family:'Courier Prime', monospace;
-                font-weight:700;
-                font-size:20px;
-                line-height:20px;
-                box-shadow:5px 5px 10px 1px var(--pink);">
-                Homepage
-            </button>
-        </a>
-    </div>
-    """, unsafe_allow_html=True)
- 
+    if st.button("Homepage", key="btn_homepage"):
+        st.switch_page("homepage.py")            
+
 with col2:
-    st.markdown("""
-    <div style="text-align:center;">
-        <a href="/pages/review" target="_self">
-            <button style="
-                background-color:var(--lime);
-                border:2px solid var(--ink);
-                border-radius:16px;
-                height:60px;
-                padding:10px 30px;
-                font-family:'Courier Prime', monospace;
-                font-weight:700;
-                font-size:20px;
-                line-height:20px;
-                box-shadow:5px 5px 10px 1px var(--pink);">
-                Analyze Movies
-            </button>
-        </a>
-    </div>
-    """, unsafe_allow_html=True)
+    if st.button("Analyze Movies", key="btn_analyze_movies"):
+        st.switch_page("pages/review.py")
+
 
 # ======= TITLE =======
 st.markdown("""<style>
