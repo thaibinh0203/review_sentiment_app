@@ -1,9 +1,11 @@
+# BaseModel đảm bảo dữ liệu bước vào domain luôn sạch, đúng kiểu, giảm lỗi vặt khi xử lý logic nghiệp vụ.
 from pydantic import BaseModel, field_validator
 from typing import List, Union
 
+# loại API nhận vào sẽ là str hoặc list
 class ReviewRequest(BaseModel):
     text: Union[str, List[str]]
-
+    
     @field_validator("text", mode="before")
     @classmethod
     def _coerce(cls, v):
