@@ -1,305 +1,255 @@
 import streamlit as st
-
-# 1. CẤU HÌNH
-st.set_page_config(page_title = "Movie Homepage", layout = "wide")
-
-# 2. THÊM FONT TỪ GOOGLE
-st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400..700;1,400..700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-</style>
-""", unsafe_allow_html = True)
-
-# 3. CSS
-st.markdown("""
-<style>
-    /* 1. Background */
-    [data-testid="stAppViewContainer"] {
-        background-color: #FCFAF5;
-    }
-
-    /* 2. Headings */
-    .headings-font {
-        font-family: 'Baskervville', serif;
-        font-weight: 400;
-        font-size: 40px;
-        color: #1A1A1A;
-        text-align: center;
-    }
-    
-    /* 3. Subhead */
-    .subhead-font {
-        font-family: 'Courier Prime', monospace;
-        font-weight: 700;
-        font-size: 30px;
-        color: #1A1A1A;
-        text-align: center;
-    }
-    .pink-highlight { color: #FFD6E0; }
-    .blue-highlight { color: #D6EFFF; }
-
-    /* 4. Body */
-    .body-text {
-        font-family: 'Courier Prime', monospace;
-        font-weight: 700; /* Bold */
-        font-size: 20px;
-        color: #1A1A1A;
-        text-align: center;
-    }
-    
-    /* 5. Button */
-        div[data-testid="stButton"] > button {
-            background-color: #D8FF84;
-            color: #1A1A1A;
-            border: 3px solid #1A1A1A;
-            border-radius: 16px;
-            padding: 10px 24px;
-            width: 100%;
-            font-family: 'Courier Prime', monospace;
-            font-weight: 700;
-            font-size: 20
-    }
-            
-    div[data-testid="stButton"] > button:hover {
-        background-color: #FFFFFF;
-        color: #1A1A1A;
-        border: 3px solid #1A1A1A;
-    }
-
-    /* 6. Callout/Cards */
-    .callout {
-        border-radius: 16px;
-        padding: 8px 12px;
-        text-align: center;
-        display: inline-block;
-        margin-top: 10px;
-        border: 3px solid #1A1A1A;
-        font-family: 'Courier Prime', monospace;
-        font-weight: 700;
-        font-size: 20px;
-    }
-            
-    .callout-pink {
-        background-color: #FFD6E0;
-        color: #1A1A1A;
-    }
-            
-    .callout-blue {
-        background-color: #D6EFFF;
-        color: #1A1A1A;
-    }
-    .stack-wrap { position:relative; width:1400px; height:500px; margin:-30px auto 0 auto; }
-        .card { position:absolute; width:300px; height:440px; border-radius:20px; overflow:hidden;
-                border:3px solid #1A1A1A; box-shadow:0 25px 30px rgba(0,0,0,0.3); transition:0.2s; }
-        .card img{ width:100%; height:100%; object-fit:cover; display:block; }
-        .card:hover{ transform:scale(1.06) translateY(-12px); z-index:20; }
-        .c1{ left:0px; top:20px; transform:rotate(-14deg); }
-        .c2{ left:230px; top:0px; transform:rotate(-6deg); }
-        .c3{ left:460px; top:-15px; transform:rotate(0deg); }
-        .c4{ left:690px; top:0px; transform:rotate(6deg); }
-        .c5{ left:920px; top:20px; transform:rotate(14deg); }
-        .stack-callout{ width:1400px; margin:25px auto; text-align:center;}
-        .badge{ display:inline-block; margin:0 20px; border:3px solid #1A1A1A;
-                padding:10px 20px; border-radius:16px;
-                font-family:'Courier Prime', monospace; font-weight:700; }
-</style>
-            
-""", unsafe_allow_html = True)
-
-# 3. WEB LAYOUT
-
-# Navigation Bar
-header_cols = st.columns([2, 1, 1]) # Chia layout thành 3 cột
-import os
+import pandas as pd
+import requests
 from pathlib import Path
 
-BASE_DIR = Path(os.getcwd()) # Lấy đường dẫn thư mục hiện tại
-poster_dir = BASE_DIR / "images" # Thư mục chứa ảnh
+# ===================== PATH & KEYS ======================
+LOGO_PATH = Path("images/LOGO.jpg")
+MOVIES_CSV  = "data/tmdb_5000_movies.csv"
+CREDITS_CSV = "data/tmdb_5000_credits.csv"
 
-# Hiển thị logo nếu tồn tại
-with header_cols[0]:
-    try:
-        st.image(str((poster_dir / "LOGO.jpg")), width=300)
-    except FileNotFoundError:
-        st.error("Lỗi: Không tìm thấy LOGO.jpg")
+TMDB_API_KEY = "32be515044e4f084aa5b020364d6e780"
 
-# Header and subheader
-rounded_box_css_new = """
-<style>
-.rounded-box-new {
-    /* Kích thước và căn chỉnh */
-    padding: 30px;               /* Tăng khoảng đệm để box lớn hơn */
-    margin: 20px auto;
-    width: fit-content;
-    
-    /* Thiết kế hộp mới */
-    border: 3px solid #00BCD4;   /* VIỀN XANH THỔ NHĨ KỲ (dày hơn) */
-    border-radius: 12px;         /* Góc bo tròn 12px */
-    background-color: #E0F7FA;   /* NỀN XANH BẦU TRỜI NHẠT */
-    
-    /* Phong cách chữ */
-    color: #212121;              /* Màu chữ mặc định là XÁM ĐEN */
-    font-size: 36px;             /* Tăng cỡ chữ */
-    font-family: Baskervville, serif;
-    text-align: center;
-    font-weight: bold;
-}
-</style>
-"""
+# ===================== PAGE CONFIG ======================
+st.set_page_config(page_title="RCM • Movie Recommender", layout="wide")
 
-st.markdown(rounded_box_css_new, unsafe_allow_html=True)
-
+# ===================== FONTS + CONTAINER =================
 st.markdown("""
-<div class="rounded-box-new">
-    When the <span style='color: #FF8A80;'>Bag of Words</span> meets the <span style='color: #4FC3F7;'>Bags of Popcorn</span>
-</div>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{ --bg:#FCFAF5; --ink:#1A1A1A; --lime:#D8FF84; --pink:#FFD6E0; --blue:#D6EFFF; }
+[data-testid="stAppViewContainer"]{ background:var(--bg); }
+.block-container{ max-width:1400px; padding-top:80px; }
+
+</style>""", unsafe_allow_html=True)
+            
+# ===================== LOGO + NAVIGATION ==========================
+col_img, col1, col2 = st.columns([3, 3, 3])
+
+with col_img:    
+    logo_path = Path.cwd() / "images" / "LOGO.jpg"
+    if logo_path.exists():
+        st.image(str(logo_path), width=300)
+    else:
+        st.error(f"Không tìm thấy logo: {logo_path}")
+
+with col1:
+    st.markdown("""
+    <div style="text-align:center;">
+        <a href="/homepage" target="_self">
+            <button style="
+                background-color:var(--lime);
+                border:2px solid var(--ink);
+                border-radius:16px;
+                height:60px;
+                padding:10px 65px;  
+                font-family:'Courier Prime', monospace;
+                font-weight:700;
+                font-size:20px;
+                line-height:20px;
+                box-shadow:5px 5px 10px 1px var(--pink);">
+                Homepage
+            </button>
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
+ 
+with col2:
+    st.markdown("""
+    <div style="text-align:center;">
+        <a href="/pages/review" target="_self">
+            <button style="
+                background-color:var(--lime);
+                border:2px solid var(--ink);
+                border-radius:16px;
+                height:60px;
+                padding:10px 30px;
+                font-family:'Courier Prime', monospace;
+                font-weight:700;
+                font-size:20px;
+                line-height:20px;
+                box-shadow:5px 5px 10px 1px var(--pink);">
+                Analyze Movies
+            </button>
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ======= TITLE =======
+st.markdown("""<style>
+h1.hero{
+    text-align:center; margin-top:10px; color:var(--ink);
+    font-family:'Baskervville',serif; font-weight:500; font-size:50px; 
+} 
+.hero .hi{ background:var(--pink); padding:0 8px; border-radius:6px; } 
+</style>
+
+<h1 class="hero">Your <span class="hi">next</span> movie</h1>
 """, unsafe_allow_html=True)
 
-st.markdown("<div style='text-align: center; font-size: 28px; font-weight: bold;'>This is a web for you to analyze your reviews or find your favorite movie !</div>", unsafe_allow_html=True)
+st.markdown("---")  
 
+# ============== INPUT BOX + RECOMMEND BUTTON + GALLERY ================           
+st.markdown("""<style>
+/* ======= INPUT BOX ======= */
+.stSelectbox label { display:none; }
+.stSelectbox > div > div { height:60px; }
 
-st.divider()
+/* Style box */
+div[data-baseweb="select"] {
+    background-color: var(--bg) !important;  /* Keep your preferred blue */
+    border: 3px solid var(--ink) !important;
+    border-radius: 11px !important;
+}
+/* Text inside */
+div[data-baseweb="select"] * {
+    background-color: transparent !important;
+    font-family: 'Courier Prime', monospace !important;
+    font-size: 17px !important;
+    align-items: center;
+}
 
-import base64
-from pathlib import Path
-import streamlit as st
-import streamlit.components.v1 as components
+/* ======= RECOMMEND BUTTON ======= */
+div[data-testid="stVerticalBlock"] button{
+    height:65px; border:3px solid var(--ink); border-radius:11px; background:var(--lime);
+    box-shadow:5px 5px 10px 1px var(--pink); transition:transform .15s ease; align-items:center;
+}
+div[data-testid="stVerticalBlock"] button > * {
+    color:var(--ink); font-family:'Courier Prime',monospace; font-weight:700; font-size:20px;
+}
+div[data-testid="stVerticalBlock"] button:hover{ 
+    background:var(--lime); box-shadow:5px 5px 10px 1px var(--pink); transform:scale(1.03); 
+}
 
-# ==== helper: đọc ảnh & encode base64 ====
-def img_b64(p: Path) -> str:
-    with open(p, "rb") as f:
-        return base64.b64encode(f.read()).decode("utf-8")
+/* ======= GALLERY ======= */
+.gallery-title{
+    text-align:center; font-family:'Courier Prime',monospace; font-weight:700;
+    font-size:26px; margin:10px 0 20px; color:var(--ink);
+} 
+.card{ text-align:center; margin-bottom:30px; }
+.card img{
+    aspect-ratio: 2 / 3; width:auto; border-radius:16px; box-shadow:0 6px 12px rgba(0,0,0,.25);
+    display:block; margin:0 auto; object-fit:cover;
+}
+.card:hover img { transform: scale(1.05); }
+.card .caption{
+    margin-top:12px; font-family:'Courier Prime',monospace; font-weight:700; font-size:14px;
+    letter-spacing:1.3px; color:var(--ink); text-transform:uppercase;
+}
+</style> """, unsafe_allow_html=True)
 
+# ===================== TMDB POSTER ======================
+@st.cache_resource
+def load_data():
+    import ast
+    import numpy as np
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
 
+    movies = pd.read_csv(MOVIES_CSV)
+    credits = pd.read_csv(CREDITS_CSV)
 
-posters = [
-    poster_dir / "POSTER 1.jpg",
-    poster_dir / "POSTER 2.jpg",
-    poster_dir / "POSTER 3.jpg",
-    poster_dir / "POSTER 4.jpg",
-    poster_dir / "POSTER 5.jpg",
-]
-b64s = [img_b64(p) for p in posters]
+    df = movies.merge(credits, on="title")
 
-# ==== HTML + CSS: xếp chồng & xoay ====
-# ==== HTML + CSS: xếp chồng & xoay (BẢN CÓ BADGE ĐÈ LÊN ẢNH) ====
-html = f"""
-<div class="poster-stack">
-  <div class="card card-1"><img src="data:image/jpeg;base64,{b64s[0]}" /></div>
-  <div class="card card-2"><img src="data:image/jpeg;base64,{b64s[1]}" /></div>
-  <div class="card card-3"><img src="data:image/jpeg;base64,{b64s[2]}" /></div>
-  <div class="card card-4"><img src="data:image/jpeg;base64,{b64s[3]}" /></div>
-  <div class="card card-5"><img src="data:image/jpeg;base64,{b64s[4]}" /></div>
+    def convert(obj):
+        L = []
+        for i in ast.literal_eval(obj):
+            L.append(i["name"])
+        return L
 
-  <!-- callouts -->
-  <div class="badge badge-1">96% Positive 😊</div>
-  <div class="badge badge-3">Mind-twisted 🤩</div>
-  <div class="badge badge-5">AMAZING 😱!!!!</div>
-</div>
+    df["genres"] = df["genres"].apply(convert)
+    df["keywords"] = df["keywords"].apply(convert)
 
-<style>
- .poster-stack {{
-  position: relative;
-  max-width: 1500px;   /* trước: 1100px */
-  height: 630px;       /* trước: 520px */
-  margin: 0 auto;
-}}
+    def convert_cast(obj):
+        L = []
+        counter = 0
+        for i in ast.literal_eval(obj):
+            if counter < 3:
+                L.append(i["name"])
+                counter += 1
+        return L
 
-.poster-stack .card {{
-  position: absolute;
-  top: 40px;
-  width: 320px;        /* trước: 220/260px -> TO HƠN */
-  aspect-ratio: 2/3;
-  border-radius: 16px;
-  overflow: hidden;
-  border: 3px solid #1A1A1A;
-  box-shadow: 0 18px 30px rgba(0,0,0,0.25);
-  transition: transform 180ms ease, box-shadow 180ms ease;
-}}
-  .poster-stack .card img {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
-  .poster-stack .card:hover {{ transform: translateY(-6px) scale(1.03) rotate(var(--rot)); z-index: 20; }}
+    df["cast"] = df["cast"].apply(convert_cast)
 
-  /* vị trí & góc xoay từng ảnh */
-/* vị trí & góc xoay từng ảnh – spacing nới ra */
-.poster-stack .card-1 {{ left: 4%;  transform: translateX(0)     rotate(-12deg); --rot:-12deg; z-index:5; }}
-.poster-stack .card-2 {{ left: 24%; transform: translateX(-10%)  rotate(-6deg);  --rot:-6deg;  z-index:7; }}
-.poster-stack .card-3 {{ left: 44%; transform: translateX(-20%)  rotate(0deg);   --rot:0deg;   z-index:9; }}
-.poster-stack .card-4 {{ left: 64%; transform: translateX(-30%)  rotate(6deg);   --rot:6deg;   z-index:7; }}
-.poster-stack .card-5 {{ left: 84%; transform: translateX(-40%)  rotate(12deg);  --rot:12deg;  z-index:5; }}
+    def get_director(obj):
+        for i in ast.literal_eval(obj):
+            if i["job"] == "Director":
+                return i["name"]
+        return ""
+        
+    df["crew"] = df["crew"].apply(lambda x: [get_director(x)])
 
+    df["tags"] = df["genres"] + df["keywords"] + df["cast"] + df["crew"]
+    df["tags"] = df["tags"].apply(lambda x: " ".join(x))
+    df = df[["movie_id","title","tags"]]
 
-  /* === BADGE ĐÈ LÊN ẢNH === */
-  .poster-stack .badge {{
-    position: absolute;
-    bottom: 200px;                 /* đẩy badge lên giữa poster */
-    padding: 8px 14px;
-    border-radius: 14px;
-    border: 3px solid #1A1A1A;
-    font-family: 'Courier Prime', monospace;
-    font-weight: 700;
-    color: #1A1A1A;
-    z-index: 9999;                 /* nằm trên poster */
-    box-shadow: 0 8px 16px rgba(0,0,0,0.12);
-  }}
-.poster-stack .badge-1 {{ 
-  left: 10%; 
-  bottom: 100px;          /* 215 -> 195 */
-  background:#D6EFFF; 
-  transform: rotate(-6deg); 
-}}
+    tfidf = TfidfVectorizer(stop_words="english")
+    vectors = tfidf.fit_transform(df["tags"])
+    similarity = cosine_similarity(vectors)
 
-.poster-stack .badge-3 {{
-  left: 48%; 
-  bottom: 550px;          /* 245 -> 225 */
-  background:#FFD6E0; 
-  transform: translateX(-20%) rotate(2deg); 
-}}
+    return df.reset_index(drop=True), similarity
 
-.poster-stack .badge-5 {{ 
-  left: 70%; 
-  bottom: 100px;          /* 225 -> 205 */
-  background:#D6EFFF; 
-  transform: rotate(5deg); 
-}}
+movies, similarity = load_data()
+all_titles = movies["title"].tolist()
 
+def fetch_poster(movie_id):
+    url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
+    data = requests.get(url).json()
+    p = data.get("poster_path")
+    return f"https://image.tmdb.org/t/p/w500{p}" if p else None
 
-  /* responsive */
-  @media (max-width: 1200px) {{
-    .poster-stack {{ height: 460px; }}
-    .poster-stack .card {{ width: 200px; }}
-    .poster-stack .badge {{ bottom: 170px; }}
-  }}
-  @media (max-width: 992px) {{
-    .poster-stack {{ height: 420px; }}
-    .poster-stack .card {{ width: 180px; }}
-    .poster-stack .badge {{ bottom: 150px; }}
-  }}
-  @media (max-width: 820px) {{
-    .poster-stack {{ height: 360px; }}
-    .poster-stack .card {{ width: 140px; }}
-    .poster-stack .badge {{ bottom: 120px; }}
-  }}
-</style>
-"""
+# ===================== RECOMMEND CORE ===================
+def recommend(title, top_k=10):
+    # vị trí phim được chọn
+    index = movies[movies["title"] == title].index[0]
+    # sắp xếp theo độ tương tự giảm dần
+    distances = sorted(
+        list(enumerate(similarity[index])),
+        reverse=True,
+        key=lambda x: x[1]
+    )
+    # bỏ phần tử đầu tiên (chính nó), lấy top_k tiếp theo
+    picks = []
+    for i, _score in distances[1: top_k + 1]:
+        row = movies.iloc[i]
+        picks.append((row["title"], row["movie_id"]))
+    return picks
 
-# Nhúng HTML vào Streamlit
-components.html(html, height=560, scrolling=False)
+# ===================== INPUT + BUTTON ===================
+c1, cbtn, _ = st.columns([7, 2, 0.25])
+with c1:
+    # was: selected = st.selectbox("", movie_titles, index=0)
+    selected = st.selectbox("", all_titles, index=0)
+with cbtn:
+    run = st.button("Recommend", use_container_width=True)
 
-
-# Nút chuyển trang (CTA)
-_, bot_col1, bot_col2, _ = st.columns([1.5, 1, 1, 1.5])
-
-with bot_col1:
-    if st.button("Start analyzing your movie", key="bot1"):
-        st.toast("Starting...")
-        st.switch_page("pages/review.py")
-
-with bot_col2:
-    if st.button("Find your next movies", key="bot2"):
-        st.toast("Starting...")
-        st.switch_page("pages/recommendations.py")
-
-
-
-
-
+# ===================== RESULTS ==========================
+if run:
+    recs = recommend(selected, top_k=10)
+    if not recs:
+        st.warning("No recommendation found for this title.")
+    else:
+        st.markdown('<div class="gallery-title">Recommended movies:</div>', unsafe_allow_html=True)
+        rows = [recs[:5], recs[5:10]]
+        for row in rows:
+            cols = st.columns(5, gap="large")
+            for col, (title, mid) in zip(cols, row):
+                with col:
+                    poster = fetch_poster(int(mid))
+                    if poster:
+                        st.markdown(f"""
+                            <div class="card">
+                                <img src="{poster}" alt="{title}">
+                                <div class="caption">{title}</div>
+                            </div>""", unsafe_allow_html=True)                    
+                    else:
+                        st.markdown(f"""
+                            <div class="card">
+                                <div style="height:350px;width:230px;border-radius:16px;
+                                background:#eee;display:flex;align-items:center;justify-content:center;
+                                color:#666;box-shadow:0 6px 12px rgba(0,0,0,.25);margin:0 auto;">No poster🎬</div>
+                            <div class="caption">{title}</div>
+                            </div>""", unsafe_allow_html=True)
