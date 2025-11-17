@@ -29,53 +29,23 @@ st.markdown("""
 # 3 cột theo đúng layout ảnh 2
 col_logo, col_home, col_reco = st.columns([2, 3, 3])
 
-# ===== LOGO =====
-with col_logo:
+col_img, col1, col2 = st.columns([2, 2, 2])
+from pathlib import Path
+with col_img:
     logo_path = Path.cwd() / "images" / "LOGO.jpg"
     if logo_path.exists():
-        st.image(str(logo_path), width=260, use_column_width=False)
+        st.image(str(logo_path), width=300)
     else:
         st.error(f"Không tìm thấy logo: {logo_path}")
 
+with col1:
+    if st.button("Homepage", use_container_width=True):
+        st.switch_page("homepage.py")            
 
-# ===== CSS CHO NÚT DÀI =====
-st.markdown("""
-<style>
-.menu-btn > button {
-    background-color: var(--lime);
-    border: 2px solid var(--ink);
-    border-radius: 16px;
-    font-family: 'Courier Prime', monospace;
-    font-weight: 700;
-    font-size: 20px;
-    padding: 18px 0px;         /* chiều cao nút */
-    width: 100%;               /* giúp nút dài toàn cột */
-    box-shadow: 5px 5px 10px 1px var(--pink);
-    cursor: pointer;
-}
-.menu-btn > button:hover {
-    transform: translateY(-2px);
-}
-</style>
-""", unsafe_allow_html=True)
+with col2:
+    if st.button("Analyze Reviews", use_container_width=True):
+        st.switch_page("pages/review.py") 
 
-
-# ===== NÚT HOMEPAGE =====
-with col_home:
-    st.markdown('<div class="menu-btn">', unsafe_allow_html=True)
-    if st.button("Homepage", key="btn_home", use_container_width=True):
-        st.switch_page("homepage.py")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-
-# ===== NÚT MOVIES RECOMMENDATIONS =====
-with col_reco:
-    st.markdown('<div class="menu-btn">', unsafe_allow_html=True)
-    if st.button("Movies Recommendations", key="btn_rec", use_container_width=True):
-        st.switch_page("pages/review.py")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# ===================== SUBTITLE =====================
 st.markdown("""
     <style>
         .subtitle-box {
@@ -85,6 +55,7 @@ st.markdown("""
             color: #1A1A1A;
             margin-top: 20px;
         }
+
         .highlight {
             background-color: #FFD6E0;
             padding: 4px 10px;
