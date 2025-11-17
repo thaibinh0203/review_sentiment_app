@@ -25,10 +25,8 @@ st.markdown("""
 .block-container{ max-width:1400px; padding-top:80px; }
 
 </style>""", unsafe_allow_html=True)
-            
-# 3 cột theo đúng layout ảnh 2
-col_logo, col_home, col_reco = st.columns([2, 3, 3])
 
+#Navigation
 col_img, col1, col2 = st.columns([2, 2, 2])
 from pathlib import Path
 with col_img:
