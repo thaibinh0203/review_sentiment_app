@@ -26,54 +26,75 @@ st.markdown("""
 
 </style>""", unsafe_allow_html=True)
             
-# ===================== LOGO + NAVIGATION ==========================
-# Tạo 3 cột: logo (2 phần) + 2 nút (1 phần mỗi cái)
-col_logo, col_home, col_reco = st.columns([2, 1, 1])
+# ===================== NAVIGATION =====================
+col_img, col1, col2 = st.columns([2, 2, 2])
+from pathlib import Path
 
-# ---- LOGO ----
-with col_logo:
-    logo_path = Path.cwd() / "images" / "LOGO.jpg"
-    if logo_path.exists():
-        st.image(str(logo_path), width=280)
-    else:
-        st.error(f"Không tìm thấy logo: {logo_path}")
-
-# ---- CSS CHO BUTTON ----
+# ---- CSS STYLE CHO NÚT (giống ảnh 2) ----
 st.markdown("""
 <style>
-.menu-btn > button {
-    background-color: var(--lime);
-    border: 2px solid var(--ink);
-    border-radius: 16px;
-    font-family: 'Courier Prime', monospace;
-    font-weight: 700;
-    font-size: 20px;
-    padding: 14px 40px;   /* nút nhỏ hơn cho vừa hàng */
-    box-shadow: 5px 5px 10px 1px var(--pink);
-    cursor: pointer;
-    width: 100%;
+/* Style cho tất cả nút trong col1 và col2 */
+div[data-testid="column"] div[data-testid="stButton"] > button {
+    background-color: var(--lime) !important;
+    border: 2px solid var(--ink) !important;
+    border-radius: 16px !important;
+    font-family: 'Courier Prime', monospace !important;
+    font-weight: 700 !important;
+    font-size: 20px !important;
+    padding: 18px 0px !important;
+    box-shadow: 5px 5px 10px 1px var(--pink) !important;
+    width: 100% !important;
+    height: 60px !important;
 }
-.menu-btn > button:hover {
-    transform: translateY(-2px);
+
+/* Căn giữa nút trong từng cột */
+div[data-testid="column"] div[data-testid="stButton"] {
+    text-align: center !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ---- NÚT HOMEPAGE ----
-with col_home:
-    st.markdown('<div class="menu-btn">', unsafe_allow_html=True)
-    if st.button("Homepage", key="btn_home", use_container_width=True):
+# ---- LOGO ----
+with col_img:
+    logo_path = Path.cwd() / "images" / "LOGO.jpg"
+    if logo_path.exists():
+        st.image(str(logo_path), width=300)
+    else:
+        st.error(f"Không tìm thấy logo: {logo_path}")
+
+# ---- BUTTON 1 ----
+with col1:
+    if st.button("Homepage", use_container_width=True):
         st.switch_page("homepage.py")
-    st.markdown('</div>', unsafe_allow_html=True)
 
-# ---- NÚT MOVIE RECO ----
-with col_reco:
-    st.markdown('<div class="menu-btn">', unsafe_allow_html=True)
-    if st.button("Movies Recommendations", key="btn_rec", use_container_width=True):
-        st.switch_page("pages/review.py")
-    st.markdown('</div>', unsafe_allow_html=True)
+# ---- BUTTON 2 ----
+with col2:
+    if st.button("Movies Recommendations", use_container_width=True):
+        st.switch_page("pages/recommendations.py")
 
+# ===================== SUBTITLE =====================
+st.markdown("""
+    <style>
+        .subtitle-box {
+            font-family: 'Caveat', cursive;
+            font-size: 40px;
+            text-align: center;
+            color: #1A1A1A;
+            margin-top: 20px;
+        }
+        .highlight {
+            background-color: #FFD6E0;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+    </style>
 
+    <div class="subtitle-box">
+        Help you <span class="highlight">analyze</span> your movies
+    </div>
+""", unsafe_allow_html=True)
+
+st.markdown("---")
 
 # ======= TITLE =======
 st.markdown("""<style>
