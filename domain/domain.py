@@ -5,9 +5,10 @@ from typing import List, Union
 # loại API nhận vào sẽ là str hoặc list
 class ReviewRequest(BaseModel):
     text: Union[str, List[str]]
-    
+    # xử lí text trước khi check kiểu ở Union, class method cho phép gọi class thay vì instance. 
     @field_validator("text", mode="before")
     @classmethod
+    
     def _coerce(cls, v):
         if isinstance(v, str):
             return v
