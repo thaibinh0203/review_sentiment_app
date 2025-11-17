@@ -10,7 +10,7 @@ Especially, we use Streamlit to design web, share.streamlit.io to make the web u
 HERE IS THE LINK FOR THE WEB : https://reviewsentimentapp-xntsyzheg3id5vbngkiq6j.streamlit.app/ ( CAUTION: If this analyzing reviews meet RunTimeError or do not give result, try to analyse AGAIN as the API deployment on Render with the freemode sometimes work kinda slow especially at the first input, from the second one it is much faster ! )
 
 Also, we want to introduce different branches in our Github as we need different parts to be in different branches. 
-First, regarding Review_Sentiment_Machine_Learning, this is the first part of our work, in this branch, we test 3 different machine learning models for the NLP problem ( Bag of Words meet Bag of Popcorns ) and find the best model along with using TFIDF, data cleaning and dump these threes in a pkl file so that we can later use in other parts. 
+First, regarding Review_Sentiment_Machine_Learning, this is the first part of our work, in this branch, we test 3 different machine learning models for the NLP problem ( Bag of Words meet Bag of Popcorns ) and find the best model along with using TFIDF, data cleaning and dump the best in a pkl file so that we can later use in other parts. 
 Second, regarding Review_Sentiment_Backend_Render, this is a branch linking to our API deployment on Render consisting artifacts where we load the pkl file mentioned before, domain where API is received and results are returned and services where we process file, handle input and return output and main where we use all the before files for Render to run. 
 Third, regarding Movie_Recommendations_Machine_Learning, this a branch where we test the algorithm to test the film and run on localhost before converting to the last part is uploading to share.streamlit.io
 Foruth, regarding Homepage_Combine, this is the last part of our proect, consisting of all things we did before, where we create a homepage to approach 2 functions, review.py where we load the web for Review_Sentiment_Machine_Learning model to practice and recommendations.py where we apply the algorithm for recommend we test before. 
@@ -19,15 +19,15 @@ II. Team members and task assignment
 1. Thái Thanh Bình (Leader) 120% :
 - Finding ideas for the project, learn about the idea and the workflow of the Machine Learning Bag of Words meets Bag of Popcorns assignment.
 
-- Learning about streamlit and divide works for members 
+- Learning about streamlit to divide works
 
 - Learning about Machine Learning algorithms for Bag of Words meets Bag of Popcorns assignment.  (Logistic regression + Linear SVC)
 
-- Learning about how to deploy machine learning model to API deployment and code the Review_Sentiment_Backend_Render part 
+- Learning about how to deploy machine learning model to API deployment and code the Review_Sentiment_Backend_Render branch 
 
 - Code the ReviewSentiment.ipynb in Review_Sentiment_Machine_Learning branch from first code sentence to predict_batch ( except for the data cleaning part)
 
-- Combine codes of each member, fixing bugs when combining and uploading to Share.streamlit.io
+- Combine codes of each member which are all locals, fixing bugs when combining and uploading to Share.streamlit.io
 
 - Code the function part in review.py in Homepage_Combine branch
 2. Nguyễn Ngọc Linh (nhóm phó) 101% :
@@ -37,7 +37,7 @@ II. Team members and task assignment
 
 - Finding ideas for expanding the project idea which is Movie Recommendations, learn about the idea and its workflow.
 
-- Code the Movie_Recommendations_Testing part and the function part in recommendations.py in Homepage_Combine branch 
+- Code the Movie_Recommendations_Testing branch and the function part in recommendations.py in Homepage_Combine branch 
 3. Phùng Nhật Minh 101% :
 - Code the ReviewSentiment.ipynb cleaning data part 
 
