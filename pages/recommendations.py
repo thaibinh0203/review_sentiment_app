@@ -27,30 +27,20 @@ st.markdown("""
 </style>""", unsafe_allow_html=True)
             
 # ===================== LOGO + NAVIGATION ==========================
-col_img, col1, col2 = st.columns([3, 3, 3])
+# Tạo 3 cột: logo (2 phần) + 2 nút (1 phần mỗi cái)
+col_logo, col_home, col_reco = st.columns([2, 1, 1])
 
-with col_img:    
+# ---- LOGO ----
+with col_logo:
     logo_path = Path.cwd() / "images" / "LOGO.jpg"
     if logo_path.exists():
-        st.image(str(logo_path), width=300)
+        st.image(str(logo_path), width=280)
     else:
         st.error(f"Không tìm thấy logo: {logo_path}")
-import streamlit as st
 
-import streamlit as st
-
-# === CSS Style để nút giống ảnh 2 ===
+# ---- CSS CHO BUTTON ----
 st.markdown("""
 <style>
-/* Container 2 nút */
-.menu-container {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    margin-top: 10px;
-}
-
-/* Style nút */
 .menu-btn > button {
     background-color: var(--lime);
     border: 2px solid var(--ink);
@@ -58,37 +48,30 @@ st.markdown("""
     font-family: 'Courier Prime', monospace;
     font-weight: 700;
     font-size: 20px;
-    padding: 18px 80px;
+    padding: 14px 40px;   /* nút nhỏ hơn cho vừa hàng */
     box-shadow: 5px 5px 10px 1px var(--pink);
     cursor: pointer;
+    width: 100%;
 }
-
-/* Hover effect (tùy chọn) */
 .menu-btn > button:hover {
     transform: translateY(-2px);
 }
 </style>
 """, unsafe_allow_html=True)
 
-
-# === Layout giống ảnh 2 ===
-st.markdown('<div class="menu-container">', unsafe_allow_html=True)
-
-col1, col2 = st.columns([1, 1])
-
-with col1:
+# ---- NÚT HOMEPAGE ----
+with col_home:
     st.markdown('<div class="menu-btn">', unsafe_allow_html=True)
     if st.button("Homepage", key="btn_home", use_container_width=True):
         st.switch_page("homepage.py")
     st.markdown('</div>', unsafe_allow_html=True)
 
-with col2:
+# ---- NÚT MOVIE RECO ----
+with col_reco:
     st.markdown('<div class="menu-btn">', unsafe_allow_html=True)
     if st.button("Movies Recommendations", key="btn_rec", use_container_width=True):
         st.switch_page("pages/review.py")
     st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
 
 
 
