@@ -1,27 +1,12 @@
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.pipeline import Pipeline
 import pickle
-from sklearn.preprocessing import FunctionTransformer
-import numpy as np # Xử lí data 
-import re # Xóa HTML
-import os # Xử lí file
-import pandas as pd # thư viện đọc file
-from bs4 import BeautifulSoup               # Dùng để xóa HTML
-import nltk
-from typing import List, Union
-from sklearn.svm import LinearSVC
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, learning_curve
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import cross_val_score
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import RandomizedSearchCV
-from scipy.stats import randint
-from sklearn.model_selection import cross_validate
-from domain.domain import ReviewRequest, ReviewResponse
 import numpy as np
-from scipy import sparse
-from service.text_preproc import _clean_batch  # hàm đúng như khi train
+import pandas as pd
 import sys, types
+
+from domain.domain import ReviewRequest, ReviewResponse
+from service.text_preproc import _clean_batch
+
+# Phần này dùng để lấy hàm clean_batch từ text_preproc mà không bị lỗi 
 if "__main__" not in sys.modules:
     sys.modules["__main__"] = types.ModuleType("__main__")
 setattr(sys.modules["__main__"], "_clean_batch", _clean_batch)
@@ -41,8 +26,11 @@ class ReviewService():
         return artifact 
     def preprocess_input(self, request: ReviewRequest):
         return request.as_list()
+    # lấy cột positive ra để dễ xác định, tránh nhầm với negative
     def _positive_col(self, positive_label=1) -> int:
+        # lấy từng bước trong pipeline ra và lấy tên model
         clf = getattr(self.model, "named_steps", {}).get("model", None) or self.model.steps[-1][1]
+        # lấy class nếu có
         classes_ = getattr(clf, "classes_", None)
         if classes_ is None: return 1
         if positive_label in classes_: return int(np.where(classes_ == positive_label)[0][0])
