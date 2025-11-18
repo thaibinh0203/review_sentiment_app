@@ -25,7 +25,7 @@ Also, we want to introduce different branches in our Github as we need different
 
 ## II. Team members and task assignment
 
-1. **Thái Thanh Bình (Leader) 17.5% :**
+1. **Thái Thanh Bình (Leader) 16.5% :**
    - Finding ideas for the project, learn about the idea and the workflow of the Machine Learning Bag of Words meets Bag of Popcorns assignment.
    - Learning about streamlit to divide works
    - Learning about Machine Learning algorithms for Bag of Words meets Bag of Popcorns assignment.  (Logistic regression + Linear SVC)
@@ -34,13 +34,13 @@ Also, we want to introduce different branches in our Github as we need different
    - Combine codes of each member which are all locals, fixing bugs when combining and uploading to Share.streamlit.io
    - Code the function part in review.py in Homepage_Combine branch
 
-2. **Nguyễn Ngọc Linh (nhóm phó) 14.5% :**
+2. **Nguyễn Ngọc Linh (nhóm phó) 14.7% :**
    - Learning about Machine Learning algorithms for Bag of Words meets Bag of Popcorns assignment.  (Random Forest)
    - Code the ReviewSentiment.ipynb from predict_batch to end ( metrics calculating and comparing part )
    - Finding ideas for expanding the project idea which is Movie Recommendations, learn about the idea and its workflow.
    - Code the Movie_Recommendations_Testing branch and the function part in recommendations.py in Homepage_Combine branch 
 
-3. **Phùng Nhật Minh 14.5% :**
+3. **Phùng Nhật Minh 14.7% :**
    - Code the ReviewSentiment.ipynb cleaning data part 
    - Learn about the TF-IDF 
    - Code the design and function in homepage.py in Homepage_Combine branch 
@@ -51,17 +51,17 @@ Also, we want to introduce different branches in our Github as we need different
    - Write report
    - Make slide for presentation
 
-5. **Hoàng Linh Phương 14.5% :**
+5. **Hoàng Linh Phương 14.7% :**
    - Code the design for homepage
    - Draw and Design Homepage, Review and Recommendation Frontend
    - Code the design and function in homepage.py in Homepage_Combine branch 
    - Learning about streamlit
 
-6. **Nguyễn Lâm Huy 14.5% :**
+6. **Nguyễn Lâm Huy 14.7% :**
    - Code the design for review.py in Homepage_Combine branch 
    - Learning about streamlit
 
-7. **Lê Thị Như Ý 14.5% :**
+7. **Lê Thị Như Ý 14.7% :**
    - Code the design for recommendations in Homepage_Combine branch 
    - Learning about streamlit
 
