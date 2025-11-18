@@ -259,6 +259,12 @@ html = f"""
 </style>
 """
 
+
+
+
+components.html(html, height=560, scrolling=False)
+
+
 # CTA
 _, bot_col1, bot_col2, _ = st.columns([1.5, 1, 1, 1.5])
 
@@ -271,5 +277,3 @@ with bot_col2:
     if st.button("Find your next movies", key="bot2"):
         st.toast("Starting...")
         st.switch_page("pages/recommendations.py")
-
-
