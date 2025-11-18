@@ -3,7 +3,7 @@ import streamlit as st
 # 1. CẤU HÌNH
 st.set_page_config(page_title = "Movie Homepage", layout = "wide")
 
-# 2. THÊM FONT TỪ GOOGLE
+# 2. Font import
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400..700;1,400..700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap');
@@ -21,7 +21,7 @@ st.markdown("""
     /* 2. Headings */
     .headings-font {
         font-family: 'Baskervville', serif;
-        font-weight: 500;
+        font-weight: 400;
         font-size: 40px;
         color: #1A1A1A;
         text-align: center;
@@ -30,8 +30,8 @@ st.markdown("""
     /* 3. Subhead */
     .subhead-font {
         font-family: 'Courier Prime', monospace;
-        font-weight: 400;
-        font-size: 25px;
+        font-weight: 700;
+        font-size: 30px;
         color: #1A1A1A;
         text-align: center;
     }
@@ -48,26 +48,24 @@ st.markdown("""
     }
     
     /* 5. Button */
-    a.custom-button {
-        background-color: #D8FF84;
+        div[data-testid="stButton"] > button {
+            background-color: #D8FF84;
+            color: #1A1A1A;
+            border: 3px solid #1A1A1A;
+            border-radius: 16px;
+            padding: 10px 24px;
+            width: 100%;
+            font-family: 'Courier Prime', monospace;
+            font-weight: 700;
+            font-size: 20
+    }
+            
+    div[data-testid="stButton"] > button:hover {
+        background-color: #FFFFFF;
         color: #1A1A1A;
         border: 3px solid #1A1A1A;
-        border-radius: 16px;
-        font-family: 'Courier Prime', monospace;
-        font-weight: 400;
-        font-size: 20px;
-        padding: 16px 30px;
-        box-shadow: 5px 5px 10px #FFD6E0;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        transition: transform 0.15s ease;
     }
-    .custom-button:hover {
-        transform: scale(1.05);
-    }        
-    
-            
+
     /* 6. Callout/Cards */
     .callout {
         border-radius: 16px;
@@ -108,17 +106,15 @@ st.markdown("""
             
 """, unsafe_allow_html = True)
 
-# 3. WEB LAYOUT
+# 3. Web layout
 
 # Navigation Bar
-header_cols = st.columns([2, 1, 1]) # Chia layout thành 3 cột
+header_cols = st.columns([2, 1, 1])
 import os
 from pathlib import Path
 
-BASE_DIR = Path(os.getcwd()) # Lấy đường dẫn thư mục hiện tại
-poster_dir = BASE_DIR / "images" # Thư mục chứa ảnh
-
-# Hiển thị logo nếu tồn tại
+BASE_DIR = Path(os.getcwd())
+poster_dir = BASE_DIR / "images"
 with header_cols[0]:
     try:
         st.image(str((poster_dir / "LOGO.jpg")), width=300)
@@ -126,13 +122,38 @@ with header_cols[0]:
         st.error("Lỗi: Không tìm thấy LOGO.jpg")
 
 # Header and subheader
+rounded_box_css_new = """
+<style>
+.rounded-box-new {
+    /* Kích thước và căn chỉnh */
+    padding: 30px;               /* Tăng khoảng đệm để box lớn hơn */
+    margin: 20px auto;
+    width: fit-content;
+    
+    /* Thiết kế hộp mới */
+    border: 3px solid #00BCD4;   /* VIỀN XANH THỔ NHĨ KỲ (dày hơn) */
+    border-radius: 12px;         /* Góc bo tròn 12px */
+    background-color: #E0F7FA;   /* NỀN XANH BẦU TRỜI NHẠT */
+    
+    /* Phong cách chữ */
+    color: #212121;              /* Màu chữ mặc định là XÁM ĐEN */
+    font-size: 36px;             /* Tăng cỡ chữ */
+    font-family: monospace;      /* Chọn font monospace để code trông "techy" */
+    text-align: center;
+    font-weight: bold;
+}
+</style>
+"""
+
+st.markdown(rounded_box_css_new, unsafe_allow_html=True)
+
 st.markdown("""
-<div class="headings-font">
-    When <span style='color: #FFACC0;'>Bag of Words</span> meets <span style='color: #AADEFF;'>Bags of Popcorn</span>
+<div class="rounded-box-new">
+    When the <span style='color: #FF8A80;'>Bag of Words</span> meets the <span style='color: #4FC3F7;'>Bags of Popcorn</span>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("""<div class = "subhead-font">This is a web for you to analyze your reviews or find your favorite movie !</div>""", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; font-size: 28px; font-weight: bold;'>This is a web for you to analyze your reviews or find your favorite movie !</div>", unsafe_allow_html=True)
 
 
 st.divider()
@@ -259,6 +280,11 @@ html = f"""
 </style>
 """
 
+
+components.html(html, height=560, scrolling=False)
+
+
+# CTA
 _, bot_col1, bot_col2, _ = st.columns([1.5, 1, 1, 1.5])
 
 with bot_col1:
@@ -270,5 +296,8 @@ with bot_col2:
     if st.button("Find your next movies", key="bot2"):
         st.toast("Starting...")
         st.switch_page("pages/recommendations.py")
+
+
+
 
 
