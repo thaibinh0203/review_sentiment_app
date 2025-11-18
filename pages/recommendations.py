@@ -59,7 +59,11 @@ st.markdown("""
             padding: 4px 10px;
             border-radius: 6px;
         }
+    </style>
+
     
+
+st.markdown("---")
 
 # ======= TITLE =======
 st.markdown("""<style>
