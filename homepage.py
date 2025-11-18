@@ -259,38 +259,6 @@ html = f"""
 </style>
 """
 
-st.markdown("""
-<style>
-/* Áp dụng cho mọi st.button */
-.stButton > button {
-    background-color: #ff4b81;      /* màu hồng giống Hello Kitty / CTA */
-    color: white;
-    border-radius: 999px;           /* bo tròn full pill */
-    padding: 0.75rem 1.5rem;
-    border: none;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.2s ease-in-out;
-}
-
-/* Hover effect */
-.stButton > button:hover {
-    background-color: #ff6fa0;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Nếu muốn nút full chiều rộng trong column */
-.stButton {
-    width: 100%;
-}
-.stButton > button {
-    width: 100%;
-}
-</style>
-""", unsafe_allow_html=True)
 # CTA
 _, bot_col1, bot_col2, _ = st.columns([1.5, 1, 1, 1.5])
 
@@ -303,4 +271,5 @@ with bot_col2:
     if st.button("Find your next movies", key="bot2"):
         st.toast("Starting...")
         st.switch_page("pages/recommendations.py")
+
 
