@@ -258,45 +258,45 @@ html = f"""
   }}
 </style>
 """
-st.markdown("""
-<style>
-    /* ... các CSS khác ... */
-
-    /* Style cho st.button – ép dùng Courier Prime */
-    .stButton > button {
-        background-color: #D8FF84;
-        color: #1A1A1A;
-        border: 3px solid #1A1A1A;
-        border-radius: 16px;
-        font-family: 'Courier Prime', monospace !important;
-        font-weight: 700;          /* cho đậm giống text dưới */
-        font-size: 20px;
-        padding: 16px 30px;
-        box-shadow: 5px 5px 10px #FFD6E0;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        transition: transform 0.15s ease;
-    }
-
-    .stButton > button:hover {
-        transform: scale(1.05);
-    }
-</style>
-""", unsafe_allow_html=True)
 
 components.html(html, height=560, scrolling=False)
 
 # Nút chuyển trang (CTA với st.button)
-_, bot_col1, bot_col2, _ = st.columns([1.5, 1, 1, 1.5])
+col1, col2 = st.columns([2, 2])
 
-with bot_col1:
-    if st.button("Start analyzing your movie", key="cta_review"):
-        st.switch_page("pages/review.py")
 
-with bot_col2:
-    if st.button("Find your next movies", key="cta_reco"):
-        st.switch_page("pages/recommendations.py")
+with col1:
+    if st.button("Homepage", use_container_width=True):
+        st.switch_page("homepage.py")            
+
+with col2:
+    if st.button("Analyze Reviews", use_container_width=True):
+        st.switch_page("pages/review.py") 
+
+st.markdown("""
+    <style>
+        .subtitle-box {
+            font-family: 'Caveat', cursive;
+            font-size: 40px;
+            text-align: center;
+            color: #1A1A1A;
+            margin-top: 20px;
+        }
+
+        .highlight {
+            background-color: #FFD6E0;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+   
+    </style>
+
+    <div class="subtitle-box">
+        
+    </div>
+""", unsafe_allow_html=True)
+
+
 
 
 
