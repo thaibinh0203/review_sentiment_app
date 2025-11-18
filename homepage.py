@@ -259,21 +259,26 @@ html = f"""
 </style>
 """
 
-
-
-
+# Nhúng HTML vào Streamlit
 components.html(html, height=560, scrolling=False)
 
 
-# CTA
+# Nút chuyển trang (CTA)
 _, bot_col1, bot_col2, _ = st.columns([1.5, 1, 1, 1.5])
 
 with bot_col1:
-    if st.button("Start analyzing your movie", key="bot1"):
-        st.toast("Starting...")
-        st.switch_page("pages/review.py")
+    st.markdown("""
+        <a href="/?page=review" class="custom-button">Start analyzing your movie</a>
+    """, unsafe_allow_html=True)
 
 with bot_col2:
-    if st.button("Find your next movies", key="bot2"):
-        st.toast("Starting...")
+    st.markdown("""
+        <a href="/?page=recommendations" class="custom-button">Find your next movies</a>
+    """, unsafe_allow_html=True)
+
+if "page" in st.query_params:
+    page = st.query_params["page"][0]   # lấy phần tử đầu
+    if page == "review":
+        st.switch_page("pages/review.py")
+    elif page == "recommendations":
         st.switch_page("pages/recommendations.py")
