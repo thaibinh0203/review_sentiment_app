@@ -19,4 +19,63 @@ Also, we want to introduce different branches in our Github as we need different
 
 - Third, regarding **Movie_Recommendations_Machine_Learning**, this a branch where we test the algorithm to test the film and run on localhost before converting to the last part is uploading to share.streamlit.io
 
-- Foruth, regardi
+- Foruth, regarding **Homepage_Combine**, this is the last part of our proect, consisting of all things we did before, where we create a homepage to approach 2 functions, review.py where we load the web for Review_Sentiment_Machine_Learning model to practice and recommendations.py where we apply the algorithm for recommend we test before. 
+
+---
+
+## II. Team members and task assignment
+
+1. **Thái Thanh Bình (Leader) 17.5% :**
+   - Finding ideas for the project, learn about the idea and the workflow of the Machine Learning Bag of Words meets Bag of Popcorns assignment.
+   - Learning about streamlit to divide works
+   - Learning about Machine Learning algorithms for Bag of Words meets Bag of Popcorns assignment.  (Logistic regression + Linear SVC)
+   - Learning about how to deploy machine learning model to API deployment and code the Review_Sentiment_Backend_Render branch 
+   - Code the ReviewSentiment.ipynb in Review_Sentiment_Machine_Learning branch from first code sentence to predict_batch ( except for the data cleaning part)
+   - Combine codes of each member which are all locals, fixing bugs when combining and uploading to Share.streamlit.io
+   - Code the function part in review.py in Homepage_Combine branch
+
+2. **Nguyễn Ngọc Linh (nhóm phó) 14.5% :**
+   - Learning about Machine Learning algorithms for Bag of Words meets Bag of Popcorns assignment.  (Random Forest)
+   - Code the ReviewSentiment.ipynb from predict_batch to end ( metrics calculating and comparing part )
+   - Finding ideas for expanding the project idea which is Movie Recommendations, learn about the idea and its workflow.
+   - Code the Movie_Recommendations_Testing branch and the function part in recommendations.py in Homepage_Combine branch 
+
+3. **Phùng Nhật Minh 14.5% :**
+   - Code the ReviewSentiment.ipynb cleaning data part 
+   - Learn about the TF-IDF 
+   - Code the design and function in homepage.py in Homepage_Combine branch 
+
+4. **Ngô Mạnh Duy 10%:**
+   - Code the ReviewSentiment.ipynb cleaning data part 
+   - Learn about the TF-IDF 
+   - Write report
+   - Make slide for presentation
+
+5. **Hoàng Linh Phương 14.5% :**
+   - Code the design for homepage
+   - Draw and Design Homepage, Review and Recommendation Frontend
+   - Code the design and function in homepage.py in Homepage_Combine branch 
+   - Learning about streamlit
+
+6. **Nguyễn Lâm Huy 14.5% :**
+   - Code the design for review.py in Homepage_Combine branch 
+   - Learning about streamlit
+
+7. **Lê Thị Như Ý 14.5% :**
+   - Code the design for recommendations in Homepage_Combine branch 
+   - Learning about streamlit
+
+---
+
+## III. Instructions for installing and running the code:
+
+1. **Python version used** : 3.12
+
+2. **List of libraries to install:**  
+   There is a requirements.txt file in each branch
+
+3. **How to run :**
+   i. Files such as ReviewSentiment.ipynb and Movie_Recommendation_System.ipynb : Run like normal to test the code in local computer  
+   ii. Go to dashboard.Render to choose respitory and choose Review_Sentiment_Backend_Render branch, build command :  
+   ```bash
+   pip install -r requirement.txt
