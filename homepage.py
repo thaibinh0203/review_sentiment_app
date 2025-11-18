@@ -258,10 +258,31 @@ html = f"""
   }}
 </style>
 """
+st.markdown("""
+<style>
+    /* Style cho st.button */
+    .stButton > button {
+        background-color: #D8FF84;
+        color: #1A1A1A;
+        border: 3px solid #1A1A1A;
+        border-radius: 16px;
+        font-family: 'Courier Prime', monospace;
+        font-weight: 400;
+        font-size: 20px;
+        padding: 16px 30px;
+        box-shadow: 5px 5px 10px #FFD6E0;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        transition: transform 0.15s ease;
+    }
 
-# Nhúng HTML vào Streamlit
+    .stButton > button:hover {
+        transform: scale(1.05);
+    }
+</style>
+""", unsafe_allow_html=True)
 components.html(html, height=560, scrolling=False)
-
 
 # Nút chuyển trang (CTA với st.button)
 _, bot_col1, bot_col2, _ = st.columns([1.5, 1, 1, 1.5])
@@ -273,4 +294,5 @@ with bot_col1:
 with bot_col2:
     if st.button("Find your next movies", key="cta_reco"):
         st.switch_page("pages/recommendations.py")
+
 
