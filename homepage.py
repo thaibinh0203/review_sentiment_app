@@ -263,22 +263,14 @@ html = f"""
 components.html(html, height=560, scrolling=False)
 
 
-# Nút chuyển trang (CTA)
+# Nút chuyển trang (CTA với st.button)
 _, bot_col1, bot_col2, _ = st.columns([1.5, 1, 1, 1.5])
 
 with bot_col1:
-    st.markdown("""
-        <a href="/?page=review" class="custom-button">Start analyzing your movie</a>
-    """, unsafe_allow_html=True)
+    if st.button("Start analyzing your movie", key="cta_review"):
+        st.switch_page("pages/review.py")
 
 with bot_col2:
-    st.markdown("""
-        <a href="/?page=recommendations" class="custom-button">Find your next movies</a>
-    """, unsafe_allow_html=True)
-
-if "page" in st.query_params:
-    page = st.query_params["page"][0]   # lấy phần tử đầu
-    if page == "review":
-        st.switch_page("pages/review.py")
-    elif page == "recommendations":
+    if st.button("Find your next movies", key="cta_reco"):
         st.switch_page("pages/recommendations.py")
+
