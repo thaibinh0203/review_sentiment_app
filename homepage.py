@@ -261,13 +261,25 @@ html = f"""
 
 components.html(html, height=560, scrolling=False)
 
-# Nút chuyển trang (CTA với st.button)
-col1, col2 = st.columns([2, 2])
+# ===================== FONTS + CONTAINER =================
+st.markdown("""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 
+<style>
+:root{ --bg:#FCFAF5; --ink:#1A1A1A; --lime:#D8FF84; --pink:#FFD6E0; --blue:#D6EFFF; }
+[data-testid="stAppViewContainer"]{ background:var(--bg); }
+.block-container{ max-width:1400px; padding-top:80px; }
+
+</style>""", unsafe_allow_html=True)
+
+#Navigation
+col1, col2 = st.columns([1, 1])
 
 with col1:
-    if st.button("Homepage", use_container_width=True):
-        st.switch_page("homepage.py")            
+    if st.button("Recommendations", use_container_width=True):
+        st.switch_page("pages/recommendations.py"")            
 
 with col2:
     if st.button("Analyze Reviews", use_container_width=True):
@@ -295,6 +307,7 @@ st.markdown("""
         
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
