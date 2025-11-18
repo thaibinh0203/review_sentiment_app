@@ -59,9 +59,13 @@ st.markdown("""
             padding: 4px 10px;
             border-radius: 6px;
         }
+   
     </style>
 
-    
+    <div class="subtitle-box">
+        Help you <span class="highlight">analyze</span> your movies
+    </div>
+""", unsafe_allow_html=True)
 
 st.markdown("---")
 
