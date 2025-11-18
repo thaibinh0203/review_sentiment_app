@@ -114,22 +114,30 @@ st.markdown("""
             border-radius: 4px;
         }
 
-        /* Buttons */
-        div[data-testid="stButton"] > button {
-            background-color: #D8FF84;
-            color: #1A1A1A;
-            border: 2px solid #1A1A1A;
-            border-radius: 12px;
-            font-family: 'Courier Prime', monospace;
-            font-weight: 700;
-            font-size: 18px;
-            padding: 8px 20px;
-            box-shadow: 3px 3px 0px #FFD6E0;
-        }
-        div[data-testid="stButton"] > button:hover {
-            background-color: #FFD6E0;
-            box-shadow: 3px 3px 0px #D8FF84;
-        }
+        /* Buttons – dùng giống recommendations cho chắc */
+div[data-testid="stVerticalBlock"] button{
+    background-color: #D8FF84;
+    color: #1A1A1A;
+    border: 2px solid #1A1A1A;
+    border-radius: 12px;
+    padding: 8px 20px;
+    box-shadow: 3px 3px 0px #FFD6E0;
+    transition: transform 0.15s ease;
+}
+
+div[data-testid="stVerticalBlock"] button > * {
+    font-family: 'Courier Prime', monospace;
+    font-weight: 700;
+    font-size: 18px;
+    color: #1A1A1A;
+}
+
+div[data-testid="stVerticalBlock"] button:hover {
+    background-color: #FFD6E0;
+    box-shadow: 3px 3px 0px #D8FF84;
+    transform: scale(1.03);
+}
+
 
         /* File uploader */
         [data-testid="stFileUploader"] {
