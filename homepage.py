@@ -279,7 +279,7 @@ col1, col2 = st.columns([1, 1])
 
 with col1:
     if st.button("Recommendations", use_container_width=True):
-        st.switch_page("pages/recommendations.py"")            
+        st.switch_page("pages/recommendations.py")            
 
 with col2:
     if st.button("Analyze Reviews", use_container_width=True):
@@ -307,6 +307,7 @@ st.markdown("""
         
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
