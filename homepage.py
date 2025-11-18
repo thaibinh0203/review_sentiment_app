@@ -21,7 +21,7 @@ st.markdown("""
     /* 2. Headings */
     .headings-font {
         font-family: 'Baskervville', serif;
-        font-weight: 400;
+        font-weight: 500;
         font-size: 40px;
         color: #1A1A1A;
         text-align: center;
@@ -30,8 +30,8 @@ st.markdown("""
     /* 3. Subhead */
     .subhead-font {
         font-family: 'Courier Prime', monospace;
-        font-weight: 700;
-        font-size: 30px;
+        font-weight: 400;
+        font-size: 25px;
         color: #1A1A1A;
         text-align: center;
     }
@@ -48,24 +48,26 @@ st.markdown("""
     }
     
     /* 5. Button */
-        div[data-testid="stButton"] > button {
-            background-color: #D8FF84;
-            color: #1A1A1A;
-            border: 3px solid #1A1A1A;
-            border-radius: 16px;
-            padding: 10px 24px;
-            width: 100%;
-            font-family: 'Courier Prime', monospace;
-            font-weight: 700;
-            font-size: 20
-    }
-            
-    div[data-testid="stButton"] > button:hover {
-        background-color: #FFFFFF;
+    a.custom-button {
+        background-color: #D8FF84;
         color: #1A1A1A;
         border: 3px solid #1A1A1A;
+        border-radius: 16px;
+        font-family: 'Courier Prime', monospace;
+        font-weight: 400;
+        font-size: 20px;
+        padding: 16px 30px;
+        box-shadow: 5px 5px 10px #FFD6E0;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        transition: transform 0.15s ease;
     }
-
+    .custom-button:hover {
+        transform: scale(1.05);
+    }        
+    
+            
     /* 6. Callout/Cards */
     .callout {
         border-radius: 16px;
@@ -124,38 +126,13 @@ with header_cols[0]:
         st.error("Lỗi: Không tìm thấy LOGO.jpg")
 
 # Header and subheader
-rounded_box_css_new = """
-<style>
-.rounded-box-new {
-    /* Kích thước và căn chỉnh */
-    padding: 30px;               /* Tăng khoảng đệm để box lớn hơn */
-    margin: 20px auto;
-    width: fit-content;
-    
-    /* Thiết kế hộp mới */
-    border: 3px solid #00BCD4;   /* VIỀN XANH THỔ NHĨ KỲ (dày hơn) */
-    border-radius: 12px;         /* Góc bo tròn 12px */
-    background-color: #E0F7FA;   /* NỀN XANH BẦU TRỜI NHẠT */
-    
-    /* Phong cách chữ */
-    color: #212121;              /* Màu chữ mặc định là XÁM ĐEN */
-    font-size: 36px;             /* Tăng cỡ chữ */
-    font-family: Baskervville, serif;
-    text-align: center;
-    font-weight: bold;
-}
-</style>
-"""
-
-st.markdown(rounded_box_css_new, unsafe_allow_html=True)
-
 st.markdown("""
-<div class="rounded-box-new">
-    When the <span style='color: #FF8A80;'>Bag of Words</span> meets the <span style='color: #4FC3F7;'>Bags of Popcorn</span>
+<div class="headings-font">
+    When <span style='color: #FFD6E0;'>Bag of Words</span> meets <span style='color: #D6EFFF;'>Bags of Popcorn</span>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("<div style='text-align: center; font-size: 28px; font-weight: bold;'>This is a web for you to analyze your reviews or find your favorite movie !</div>", unsafe_allow_html=True)
+st.markdown("""<div class = "subhead-font">This is a web for you to analyze your reviews or find your favorite movie !</div>""", unsafe_allow_html=True)
 
 
 st.divider()
@@ -290,16 +267,19 @@ components.html(html, height=560, scrolling=False)
 _, bot_col1, bot_col2, _ = st.columns([1.5, 1, 1, 1.5])
 
 with bot_col1:
-    if st.button("Start analyzing your movie", key="bot1"):
-        st.toast("Starting...")
-        st.switch_page("pages/review.py")
+    st.markdown("""
+        <a href="/?page=review" class="custom-button">Start analyzing your movie</a>
+    """, unsafe_allow_html=True)
 
 with bot_col2:
-    if st.button("Find your next movies", key="bot2"):
-        st.toast("Starting...")
+    st.markdown("""
+        <a href="/?page=recommendations" class="custom-button">Find your next movies</a>
+    """, unsafe_allow_html=True)
+
+if "page" in st.query_params:
+    page = st.query_params["page"]
+    
+    if page == "review":
+        st.switch_page("pages/review.py")
+    elif page == "recommendations":
         st.switch_page("pages/recommendations.py")
-
-
-
-
-
