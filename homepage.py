@@ -3,36 +3,52 @@ import streamlit as st
 # 1. CẤU HÌNH
 st.set_page_config(page_title = "Movie Homepage", layout = "wide")
 
-# 2. THÊM FONT TỪ GOOGLE
+# ===================== FONTS + CONTAINER =================
 st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400..700;1,400..700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-</style>
-""", unsafe_allow_html = True)
-st.markdown("""
-<style>
-div.stButton > button {
-    background-color: #D8FF84;
-    color: #1A1A1A;
-    border: 3px solid #1A1A1A;
-    border-radius: 16px;
-    font-family: 'Courier Prime', monospace;
-    font-weight: 400;
-    font-size: 20px;
-    padding: 16px 30px;
-    box-shadow: 5px 5px 10px #FFD6E0;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    transition: transform 0.15s ease;
-}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 
-div.stButton > button:hover {
-    transform: translateY(-2px);
-}
-</style>
+<style>
+:root{ --bg:#FCFAF5; --ink:#1A1A1A; --lime:#D8FF84; --pink:#FFD6E0; --blue:#D6EFFF; }
+[data-testid="stAppViewContainer"]{ background:var(--bg); }
+.block-container{ max-width:1400px; padding-top:80px; }
+
+</style>""", unsafe_allow_html=True)
+
+#Navigation
+col1, col2 = st.columns([1,1])
+
+with col1:
+    if st.button("Homepage", use_container_width=True):
+        st.switch_page("homepage.py")            
+
+with col2:
+    if st.button("Analyze Reviews", use_container_width=True):
+        st.switch_page("pages/review.py") 
+
+st.markdown("""
+    <style>
+        .subtitle-box {
+            font-family: 'Caveat', cursive;
+            font-size: 40px;
+            text-align: center;
+            color: #1A1A1A;
+            margin-top: 20px;
+        }
+
+        .highlight {
+            background-color: #FFD6E0;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+   
+    </style>
+
+    <div class="subtitle-box">
+        
+    </div>
 """, unsafe_allow_html=True)
-
 # 3. CSS
 st.markdown("""
 <style>
@@ -307,6 +323,7 @@ with col1:
 with col2:
     if st.button("Analyze Reviews", use_container_width=True):
         st.switch_page("pages/review.py") 
+
 
 
 
