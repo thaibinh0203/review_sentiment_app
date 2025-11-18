@@ -63,11 +63,9 @@ st.markdown("""
     </style>
 
     <div class="subtitle-box">
-        Help you <span class="highlight">analyze</span> your movies
+        
     </div>
 """, unsafe_allow_html=True)
-
-st.markdown("---")
 
 # ======= TITLE =======
 st.markdown("""<style>
