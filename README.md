@@ -16,7 +16,7 @@ Third, regarding Movie_Recommendations_Machine_Learning, this a branch where we 
 Foruth, regarding Homepage_Combine, this is the last part of our proect, consisting of all things we did before, where we create a homepage to approach 2 functions, review.py where we load the web for Review_Sentiment_Machine_Learning model to practice and recommendations.py where we apply the algorithm for recommend we test before. 
 
 II. Team members and task assignment
-1. Thái Thanh Bình (Leader) 120% :
+1. Thái Thanh Bình (Leader) 17.5% :
 - Finding ideas for the project, learn about the idea and the workflow of the Machine Learning Bag of Words meets Bag of Popcorns assignment.
 
 - Learning about streamlit to divide works
@@ -30,7 +30,7 @@ II. Team members and task assignment
 - Combine codes of each member which are all locals, fixing bugs when combining and uploading to Share.streamlit.io
 
 - Code the function part in review.py in Homepage_Combine branch
-2. Nguyễn Ngọc Linh (nhóm phó) 101% :
+2. Nguyễn Ngọc Linh (nhóm phó) 14.5% :
 - Learning about Machine Learning algorithms for Bag of Words meets Bag of Popcorns assignment.  (Random Forest)
 
 - Code the ReviewSentiment.ipynb from predict_batch to end ( metrics calculating and comparing part )
@@ -38,14 +38,14 @@ II. Team members and task assignment
 - Finding ideas for expanding the project idea which is Movie Recommendations, learn about the idea and its workflow.
 
 - Code the Movie_Recommendations_Testing branch and the function part in recommendations.py in Homepage_Combine branch 
-3. Phùng Nhật Minh 101% :
+3. Phùng Nhật Minh 14.5% :
 - Code the ReviewSentiment.ipynb cleaning data part 
 
 - Learn about the TF-IDF 
 
 - Code the design and function in homepage.py in Homepage_Combine branch 
 
-4. Ngô Mạnh Duy 75%:
+4. Ngô Mạnh Duy 10%:
 - Code the ReviewSentiment.ipynb cleaning data part 
 
 - Learn about the TF-IDF 
@@ -53,7 +53,7 @@ II. Team members and task assignment
 - Write report
 
 - Make slide for presentation
-5. Hoàng Linh Phương 101% :
+5. Hoàng Linh Phương 14.5% :
 - Code the design for homepage
 
 - Draw and Design Homepage, Review and Recommendation Frontend
@@ -62,12 +62,12 @@ II. Team members and task assignment
 
 - Learning about streamlit
 
-6. Nguyễn Lâm Huy 101% :
+6. Nguyễn Lâm Huy 14.5% :
 - Code the design for review.py in Homepage_Combine branch 
 
 
 - Learning about streamlit
-7. Lê Thị Như Ý 101% :
+7. Lê Thị Như Ý 14.5% :
 - Code the design for recommendations in Homepage_Combine branch 
 
 - Learning about streamlit
