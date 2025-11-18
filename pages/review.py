@@ -6,6 +6,19 @@ import os
 #Title
 st.set_page_config(page_title="Movie Analytic & Recommendation", page_icon="🎬", layout="wide") #chỉnh thành wide nếu muốn nó rộng hơn
 
+# ===================== FONTS + CONTAINER =================
+st.markdown("""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{ --bg:#FCFAF5; --ink:#1A1A1A; --lime:#D8FF84; --pink:#FFD6E0; --blue:#D6EFFF; }
+[data-testid="stAppViewContainer"]{ background:var(--bg); }
+.block-container{ max-width:1400px; padding-top:80px; }
+
+</style>""", unsafe_allow_html=True)
+
 #Navigation
 col_img, col1, col2 = st.columns([2, 2, 2])
 from pathlib import Path
@@ -21,7 +34,7 @@ with col1:
         st.switch_page("homepage.py")            
 
 with col2:
-    if st.button("Movies Recommendations", use_container_width=True):
+    if st.button("Recommendations", use_container_width=True):
         st.switch_page("pages/recommendations.py") 
 
 st.markdown("""
@@ -39,10 +52,11 @@ st.markdown("""
             padding: 4px 10px;
             border-radius: 6px;
         }
+   
     </style>
 
     <div class="subtitle-box">
-        Help you <span class="highlight">analyze</span> your movies
+        
     </div>
 """, unsafe_allow_html=True)
 
