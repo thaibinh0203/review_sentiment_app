@@ -260,14 +260,16 @@ html = f"""
 """
 st.markdown("""
 <style>
-    /* Style cho st.button */
+    /* ... các CSS khác ... */
+
+    /* Style cho st.button – ép dùng Courier Prime */
     .stButton > button {
         background-color: #D8FF84;
         color: #1A1A1A;
         border: 3px solid #1A1A1A;
         border-radius: 16px;
-        font-family: 'Courier Prime', monospace;
-        font-weight: 400;
+        font-family: 'Courier Prime', monospace !important;
+        font-weight: 700;          /* cho đậm giống text dưới */
         font-size: 20px;
         padding: 16px 30px;
         box-shadow: 5px 5px 10px #FFD6E0;
@@ -282,6 +284,7 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
 components.html(html, height=560, scrolling=False)
 
 # Nút chuyển trang (CTA với st.button)
@@ -294,5 +297,6 @@ with bot_col1:
 with bot_col2:
     if st.button("Find your next movies", key="cta_reco"):
         st.switch_page("pages/recommendations.py")
+
 
 
