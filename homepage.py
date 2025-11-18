@@ -3,74 +3,12 @@ import streamlit as st
 # 1. CẤU HÌNH
 st.set_page_config(page_title = "Movie Homepage", layout = "wide")
 
-# ===================== FONTS + CONTAINER =================
+# 2. THÊM FONT TỪ GOOGLE
 st.markdown("""
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baskervvill...amily=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
-
 <style>
-:root{ --bg:#FCFAF5; --ink:#1A1A1A; --lime:#D8FF84; --pink:#FFD6E0; --blue:#D6EFFF; }
-[data-testid="stAppViewContainer"]{ background:var(--bg); }
-.block-container{ max-width:1400px; padding-top:80px; }
-
-/* ======= NAV & RECOMMEND BUTTON STYLE ======= */
-div[data-testid="stVerticalBlock"] button{
-    height:65px; 
-    border:3px solid var(--ink); 
-    border-radius:11px; 
-    background:var(--lime);
-    box-shadow:5px 5px 10px 1px var(--pink); 
-    transition:transform .15s ease; 
-    align-items:center;
-}
-div[data-testid="stVerticalBlock"] button > * {
-    color:var(--ink); 
-    font-family:'Courier Prime',monospace; 
-    font-weight:700; 
-    font-size:20px;
-}
-div[data-testid="stVerticalBlock"] button:hover{ 
-    background:var(--lime); 
-    box-shadow:5px 5px 10px 1px var(--pink); 
-    transform:scale(1.03); 
-}
-</style>""", unsafe_allow_html=True)
-
-# ===================== NAVIGATION ======================
-col1, col2 = st.columns([1, 1])
-
-with col1:
-    if st.button("Recommendations", use_container_width=True):
-        st.switch_page("pages/recommendations.py")            
-
-with col2:
-    if st.button("Analyze Reviews", use_container_width=True):
-        st.switch_page("pages/review.py") 
-
-# Subtitle (giữ như cũ)
-st.markdown("""
-    <style>
-        .subtitle-box {
-            font-family: 'Caveat', cursive;
-            font-size: 40px;
-            text-align: center;
-            color: #1A1A1A;
-            margin-top: 20px;
-        }
-
-        .highlight {
-            background-color: #FFD6E0;
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-   
-    </style>
-
-    <div class="subtitle-box">
-        
-    </div>
-""", unsafe_allow_html=True)
+    @import url('https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400..700;1,400..700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+</style>
+""", unsafe_allow_html = True)
 
 # 3. CSS
 st.markdown("""
@@ -327,16 +265,37 @@ components.html(html, height=560, scrolling=False)
 st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baskervvill...amily=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 :root{ --bg:#FCFAF5; --ink:#1A1A1A; --lime:#D8FF84; --pink:#FFD6E0; --blue:#D6EFFF; }
 [data-testid="stAppViewContainer"]{ background:var(--bg); }
 .block-container{ max-width:1400px; padding-top:80px; }
 
+/* ======= NAV & RECOMMEND BUTTON STYLE ======= */
+div[data-testid="stVerticalBlock"] button{
+    height:65px; 
+    border:3px solid var(--ink); 
+    border-radius:11px; 
+    background:var(--lime);
+    box-shadow:5px 5px 10px 1px var(--pink); 
+    transition:transform .15s ease; 
+    align-items:center;
+}
+div[data-testid="stVerticalBlock"] button > * {
+    color:var(--ink); 
+    font-family:'Courier Prime',monospace; 
+    font-weight:700; 
+    font-size:20px;
+}
+div[data-testid="stVerticalBlock"] button:hover{ 
+    background:var(--lime); 
+    box-shadow:5px 5px 10px 1px var(--pink); 
+    transform:scale(1.03); 
+}
 </style>""", unsafe_allow_html=True)
 
-#Navigation
+# ===================== NAVIGATION ======================
 col1, col2 = st.columns([1, 1])
 
 with col1:
@@ -347,10 +306,29 @@ with col2:
     if st.button("Analyze Reviews", use_container_width=True):
         st.switch_page("pages/review.py") 
 
+# Subtitle (giữ như cũ)
+st.markdown("""
+    <style>
+        .subtitle-box {
+            font-family: 'Caveat', cursive;
+            font-size: 40px;
+            text-align: center;
+            color: #1A1A1A;
+            margin-top: 20px;
+        }
 
+        .highlight {
+            background-color: #FFD6E0;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+   
+    </style>
 
-
-
+    <div class="subtitle-box">
+        
+    </div>
+""", unsafe_allow_html=True)
 
 
 
