@@ -149,7 +149,7 @@ st.markdown("""
 # Navigation Bar
 # Hiển thị logo nếu tồn tại
 try:
-    logo_path = POSTER_DIR / "LOGO.PNG"
+    logo_path = POSTER_DIR / "LOGO.png"
     logo_base64 = get_base64_image(logo_path)
     st.markdown(
         f"""
@@ -393,3 +393,4 @@ with col1:
 with col2:
     if st.button("Analyze Your Reviews", use_container_width=True):
         st.switch_page("pages/review.py")
+
