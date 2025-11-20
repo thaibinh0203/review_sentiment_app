@@ -1,24 +1,60 @@
 import streamlit as st
+import os
+from pathlib import Path
+import base64
+import streamlit.components.v1 as components
 
 # 1. CẤU HÌNH
 st.set_page_config(page_title = "Movie Homepage", layout = "wide")
 
-# 2. THÊM FONT TỪ GOOGLE
+# 2. ĐỊNH NGHĨA ĐƯỜNG DẪN & HÀM HỖ TRỢ
+BASE_DIR = Path(os.getcwd()) # Lấy đường dẫn thư mục hiện tại
+POSTER_DIR = BASE_DIR / "images"  # Thư mục chứa ảnh
+
+@st.cache_data
+def get_base64_image(image_path):
+    """Đọc file ảnh và chuyển đổi sang chuỗi base64."""
+    if not os.path.exists(image_path):
+        return None
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode()
+
+# 3. BACKGROUND
+bg_path = POSTER_DIR / "BG.jpg"
+bg_base64 = get_base64_image(bg_path)
+
+if bg_base64:
+    st.markdown(f"""
+    <style>
+    .stApp, [data-testid="stAppViewContainer"] {{
+        background-image: url("data:image/jpg;base64,{bg_base64}") !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+        background-attachment: fixed !important;
+    }}
+    
+    /* Ẩn toolbar mặc định (tùy chọn, giúp giao diện sạch hơn) */
+    [data-testid="stToolbar"] {{
+        right: 2rem;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+else:
+    st.warning(f"Không tìm thấy ảnh nền tại: {bg_path}")
+
+# 4. THÊM FONT TỪ GOOGLE
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400..700;1,400..700&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 </style>
 """, unsafe_allow_html = True)
 
-# 3. CSS
+# 5. CSS
 st.markdown("""
 <style>
-    /* 1. Background */
-    [data-testid="stAppViewContainer"] {
-        background-color: #FCFAF5;
-    }
 
-    /* 2. Headings */
+    /* 1. Headings */
     .headings-font {
         font-family: 'Baskervville', serif;
         font-weight: 500;
@@ -27,18 +63,18 @@ st.markdown("""
         text-align: center;
     }
     
-    /* 3. Subhead */
+    /* 2. Subhead */
     .subhead-font {
         font-family: 'Courier Prime', monospace;
-        font-weight: 400;
-        font-size: 25px;
+        font-weight: 600;
+        font-size: 27px;
         color: #1A1A1A;
         text-align: center;
     }
     .pink-highlight { color: #FFD6E0; }
     .blue-highlight { color: #D6EFFF; }
 
-    /* 4. Body */
+    /* 3. Body */
     .body-text {
         font-family: 'Courier Prime', monospace;
         font-weight: 700; /* Bold */
@@ -47,7 +83,7 @@ st.markdown("""
         text-align: center;
     }
     
-    /* 5. Button */
+    /* 4. Button */
     a.custom-button {
         background-color: #D8FF84;
         color: #1A1A1A;
@@ -68,7 +104,7 @@ st.markdown("""
     }        
     
             
-    /* 6. Callout/Cards */
+    /* 5. Callout/Cards */
     .callout {
         border-radius: 16px;
         padding: 8px 12px;
@@ -108,53 +144,76 @@ st.markdown("""
             
 """, unsafe_allow_html = True)
 
-# 3. WEB LAYOUT
+# 6. WEB LAYOUT
 
 # Navigation Bar
-header_cols = st.columns([2, 1, 1]) # Chia layout thành 3 cột
-import os
-from pathlib import Path
-
-BASE_DIR = Path(os.getcwd()) # Lấy đường dẫn thư mục hiện tại
-poster_dir = BASE_DIR / "images" # Thư mục chứa ảnh
-
 # Hiển thị logo nếu tồn tại
-with header_cols[0]:
-    try:
-        st.image(str((poster_dir / "LOGO.jpg")), width=300)
-    except FileNotFoundError:
-        st.error("Lỗi: Không tìm thấy LOGO.jpg")
+try:
+    logo_path = POSTER_DIR / "LOGO.PNG"
+    logo_base64 = get_base64_image(logo_path)
+    st.markdown(
+        f"""
+        <div style="text-align: center; margin-top: -50px; margin-bottom: -60px;">
+            <img src="data:image/jpg;base64,{logo_base64}" width="500"/>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+except FileNotFoundError:
+    st.error("Lỗi: Không tìm thấy LOGO.PNG")
 
 # Header and subheader
 st.markdown("""
-<div class="headings-font">
+<div class="headings-font" style="margin-top: 50px; text-align: center; font-size: 50px; font-weight: 600;">
     When <span style='color: #FFACC0;'>Bag of Words</span> meets <span style='color: #AADEFF;'>Bags of Popcorn</span>
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("""<div class = "subhead-font">This is a web for you to analyze your reviews or find your favorite movie !</div>""", unsafe_allow_html=True)
+st.markdown("""<div class = "subhead-font">This is a web for you to analyze your reviews or find your favorite movies!</div>""", unsafe_allow_html=True)
 
+# STICKER DECOR 1
+st1_path = POSTER_DIR / "sticker 3.png"
+st2_path = POSTER_DIR / "sticker 5.png"
+st3_path = POSTER_DIR / "sticker 17.png"
+st4_path = POSTER_DIR / "sticker 10.png"
+
+st1_b64 = get_base64_image(st1_path)
+st2_b64 = get_base64_image(st2_path)
+st3_b64 = get_base64_image(st3_path)
+st4_b64 = get_base64_image(st4_path)
+
+# Kiểm tra và hiển thị
+if st1_b64 and st2_b64:
+    st.markdown(f"""
+<div style="display: flex; justify-content: center; align-items: flex-end; margin-top: 20px; margin-bottom: -30px; position: relative; z-index: 100; pointer-events: none; gap: 150px;">
+    <div style="transform: translateY(30px);">
+        <img src="data:image/png;base64,{st2_b64}" style="width: 100px; height: auto; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));" />
+    </div>
+    <div style="transform: translateY(-30px) rotate(5deg);">
+        <img src="data:image/png;base64,{st1_b64}" style="width: 200px; height: auto; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));" />
+    </div>
+    <div style="transform: rotate(-15deg);">
+        <img src="data:image/png;base64,{st3_b64}" style="width: 100px; height: auto; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));" />
+    </div>
+    <div>
+        <img src="data:image/png;base64,{st4_b64}" style="width: 100px; height: auto; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));" />
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 st.divider()
-
-import base64
-from pathlib import Path
-import streamlit as st
-import streamlit.components.v1 as components
 
 # ==== helper: đọc ảnh & encode base64 ====
 def img_b64(p: Path) -> str:
     with open(p, "rb") as f:
         return base64.b64encode(f.read()).decode("utf-8")
-
-
-
+    
 posters = [
-    poster_dir / "POSTER 1.jpg",
-    poster_dir / "POSTER 2.jpg",
-    poster_dir / "POSTER 3.jpg",
-    poster_dir / "POSTER 4.jpg",
-    poster_dir / "POSTER 5.jpg",
+    POSTER_DIR / "POSTER 1.jpg",
+    POSTER_DIR / "POSTER 2.jpg",
+    POSTER_DIR / "POSTER 3.jpg",
+    POSTER_DIR / "POSTER 4.jpg",
+    POSTER_DIR / "POSTER 5.jpg",
 ]
 b64s = [img_b64(p) for p in posters]
 
@@ -177,15 +236,15 @@ html = f"""
 <style>
  .poster-stack {{
   position: relative;
-  max-width: 1500px;   /* trước: 1100px */
-  height: 630px;       /* trước: 520px */
-  margin: 0 auto;
+  max-width: 1100px;
+  height: 600px;       /* trước: 520px */
+  margin: 2 auto;
 }}
 
 .poster-stack .card {{
   position: absolute;
   top: 40px;
-  width: 320px;        /* trước: 220/260px -> TO HƠN */
+  width: 310px;        /* trước: 220/260px -> TO HƠN */
   aspect-ratio: 2/3;
   border-radius: 16px;
   overflow: hidden;
@@ -261,7 +320,32 @@ html = f"""
 
 components.html(html, height=560, scrolling=False)
 
-# ===================== FONTS + CONTAINER =================
+# STICKER DECOR 2
+st5_path = POSTER_DIR / "sticker 11.png"
+st6_path = POSTER_DIR / "sticker 19.png"
+st7_path = POSTER_DIR / "sticker 20.png"
+
+st5_b64 = get_base64_image(st5_path)
+st6_b64 = get_base64_image(st6_path)
+st7_b64 = get_base64_image(st7_path)
+
+# Kiểm tra và hiển thị
+if st1_b64 and st2_b64:
+    st.markdown(f"""
+<div style="display: flex; justify-content: center; align-items: flex-end; margin-top: -50px; margin-bottom: 50px; position: relative; z-index: 100; pointer-events: none; gap: 150px;">
+    <div style="transform: translateY(-80px);">
+        <img src="data:image/png;base64,{st6_b64}" style="width: 200px; height: auto; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));" />
+    </div>
+    <div style="transform: translateY(50px);">
+        <img src="data:image/png;base64,{st5_b64}" style="width: 350px; height: auto; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));" />
+    </div>
+    <div style="transform: translateY(30px) rotate(5deg);">
+        <img src="data:image/png;base64,{st7_b64}" style="width: 200px; height: auto; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));" />
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# FONTS + CONTAINER
 st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -276,7 +360,7 @@ st.markdown("""
 div[data-testid="stVerticalBlock"] button{
     height:65px; 
     border:3px solid var(--ink); 
-    border-radius:11px; 
+    border-radius: 20px; 
     background:var(--lime);
     box-shadow:5px 5px 10px 1px var(--pink); 
     transition:transform .15s ease; 
@@ -295,45 +379,17 @@ div[data-testid="stVerticalBlock"] button:hover{
 }
 </style>""", unsafe_allow_html=True)
 
-# ===================== NAVIGATION ======================
+st.markdown("""
+    <div style="margin-top: 50px;"></div>
+""", unsafe_allow_html=True)
+
+# CTA Buttons
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    if st.button("Recommendations", use_container_width=True):
+    if st.button("Your Next Favourite Movies", use_container_width=True):
         st.switch_page("pages/recommendations.py")            
 
 with col2:
-    if st.button("Analyze Reviews", use_container_width=True):
-        st.switch_page("pages/review.py") 
-
-# Subtitle (giữ như cũ)
-st.markdown("""
-    <style>
-        .subtitle-box {
-            font-family: 'Caveat', cursive;
-            font-size: 40px;
-            text-align: center;
-            color: #1A1A1A;
-            margin-top: 20px;
-        }
-
-        .highlight {
-            background-color: #FFD6E0;
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-   
-    </style>
-
-    <div class="subtitle-box">
-        
-    </div>
-""", unsafe_allow_html=True)
-
-
-
-
-
-
-
-
+    if st.button("Analyze Your Reviews", use_container_width=True):
+        st.switch_page("pages/review.py")
