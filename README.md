@@ -33,6 +33,7 @@ Also, we want to introduce different branches in our Github as we need different
    - Code the ReviewSentiment.ipynb in Review_Sentiment_Machine_Learning branch from first code sentence to predict_batch ( except for the data cleaning part)
    - Combine codes of each member which are all locals, fixing bugs when combining and uploading to Share.streamlit.io
    - Code the function part in review.py in Homepage_Combine branch
+   - Make slide for presentation
 
 2. **Nguyễn Ngọc Linh (nhóm phó) 15% :**
    - Learning about Machine Learning algorithms for Bag of Words meets Bag of Popcorns assignment.  (Random Forest)
@@ -49,7 +50,6 @@ Also, we want to introduce different branches in our Github as we need different
    - Code the ReviewSentiment.ipynb cleaning data part 
    - Learn about the TF-IDF 
    - Write report
-   - Make slide for presentation
 
 5. **Hoàng Linh Phương 15% :**
    - Code the design for homepage
