@@ -1,21 +1,150 @@
 import streamlit as st
 import pandas as pd
 import requests
-import os
+import base64
+from pathlib import Path
 
 #Title
-st.set_page_config(page_title="Movie Analytic & Recommendation", page_icon="🎬", layout="wide") #chỉnh thành wide nếu muốn nó rộng hơn
+st.set_page_config(page_title="Movie Analytic & Recommendation", page_icon="🎬", layout="wide")
+    
+#Add styles
+st.markdown("""
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+    /* Root & Layout */
+    :root{ --bg:#FCFAF5; --ink:#1A1A1A; --lime:#D8FF84; --pink:#FFD6E0; --blue:#D6EFFF; }
+
+    [data-testid="stAppViewContainer"]{
+        background:var(--bg);
+    }
+
+    .block-container{
+        max-width:1400px;
+        padding-top:80px;
+    }
+    
+    /* Subtitle Box */
+    .subtitle-box{
+        font-family:'Baskervville', cursive;
+        font-size:40px;
+        text-align:center;
+        color:#1A1A1A;
+        margin-top:20px;
+    }
+
+    .highlight{
+        background-color:#FFD6E0;
+        padding:4px 10px;
+        border-radius:6px;
+    }
+
+    /* Typography */
+    body, .stApp{
+        background-color:var(--bg);
+        color:var(--ink);
+        font-family:'Georgia', serif;
+    }
+
+    h1, h2, h3{
+        font-family:'Baskervville', cursive, sans-serif;
+        font-weight:bold;
+    }
+
+    /* File Uploader */
+    div[data-testid="stFileUploader"]{
+        background-color:var(--blue) !important;
+        border-radius:12px !important;
+        border:2px solid var(--ink) !important;
+        padding:12px !important;
+        font-family:'Courier Prime', monospace;
+    }
+    div[data-testid="stFileUploader"] *{
+        background-color:transparent !important;
+    }
+
+    /* Textarea */
+    div[data-testid="stTextArea"] textarea{
+        font-family:'Baskervville', cursive !important;
+        font-size:20px !important;
+        color:var(--ink) !important;
+        background-color:#FFFBEA !important;
+        border:2px solid var(--ink) !important;
+        border-radius:10px !important;
+        padding:10px !important;
+    }
+
+    /* Result Box */
+    .result-box{
+        background-color:#FFFFFF;
+        border:2px solid var(--ink);
+        border-radius:10px;
+        padding:25px 10px;
+        text-align:center;
+        font-family:'Courier Prime', monospace;
+        font-weight:800;
+        font-size:18px;
+        line-height:1.8;
+        box-shadow:4px 4px 0px var(--lime);
+        width:250px;
+        margin:0 auto;
+        position:relative;
+        top:40px;
+    }
+
+    /* Buttons */
+    div[data-testid="stVerticalBlock"] button{
+        height:65px;
+        border:3px solid var(--ink);
+        border-radius:11px;
+        background:var(--lime);
+        box-shadow:5px 5px 10px 1px var(--pink);
+        transition:transform .15s ease;
+    }
+    div[data-testid="stVerticalBlock"] button > *{
+        color:var(--ink);
+        font-family:'Courier Prime', monospace;
+        font-weight:700;
+        font-size:20px;
+    }
+    div[data-testid="stVerticalBlock"] button:hover{
+        transform:scale(1.03);
+        box-shadow:5px 5px 10px 1px var(--pink);
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+#Background
+image_path = Path.cwd() / "static" / "BG.jpg"
+
+with open(image_path, "rb") as image_file:
+    encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+
+image_url = f"data:image/jpeg;base64,{encoded_image}"
+
+st.markdown(f"""
+    <style>
+        body, .stApp {{
+            background-image: url("{image_url}") !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+            background-attachment: fixed !important;
+        }}
+    </style>
+""", unsafe_allow_html=True)
 
 #Navigation
 col_img, col1, col2 = st.columns([2, 2, 2])
-from pathlib import Path
 with col_img:
-    logo_path = Path.cwd() / "images" / "LOGO.jpg"
+    logo_path = Path.cwd() / "static" / "LOGO.jpg"
     if logo_path.exists():
         st.image(str(logo_path), width=300)
-    else:
+    else:   
         st.error(f"Không tìm thấy logo: {logo_path}")
-
 with col1:
     if st.button("Homepage", use_container_width=True):
         st.switch_page("homepage.py")            
@@ -25,165 +154,12 @@ with col2:
         st.switch_page("pages/recommendations.py") 
 
 st.markdown("""
-    <style>
-        .subtitle-box {
-            font-family: 'Caveat', cursive;
-            font-size: 40px;
-            text-align: center;
-            color: #1A1A1A;
-            margin-top: 20px;
-        }
-
-        .highlight {
-            background-color: #FFD6E0;
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-    </style>
-
-    <div class="subtitle-box">
-        Help you <span class="highlight">analyze</span> your movies
-    </div>
+<div class="subtitle-box">
+    Help you <span class="highlight">Analyze</span> your movies
+</div>
 """, unsafe_allow_html=True)
 
 st.markdown("---")
-
-#Add styles
-st.markdown("""
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Baskervville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap');
-            
-        /* Background */
-        body, .stApp {
-            background-color: #FCFAF5;
-            color: #1A1A1A;
-            font-family: 'Georgia', serif;
-        }
-
-        /* Title */
-        .main-title {
-            font-family: 'Caveat', cursive;
-            font-size: 56px;
-            color: #1A1A1A;
-            text-align: left;
-            margin-bottom: -10px;
-        }
-        /* Headings */
-        h1, h2, h3 {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            font-weight: bold;
-        }
-        
-        /* Style the input box */
-        [data-testid="stFileUploader"] {
-            background-color: #D6EFFF !important;  /* Keep your preferred blue */
-            border: 2px solid #1A1A1A !important;
-            border-radius: 12px !important;
-            padding: 16px !important;
-            box-shadow: none !important;
-        }
-
-        /* Remove inner white layers if any */
-        [data-testid="stFileUploader"] * {
-            background-color: transparent !important;
-        }
-
-        /* Style the textarea input */
-        textarea {
-            font-family: 'Caveat', cursive !important;
-            font-size: 20px !important;
-            color: #1A1A1A !important;
-            background-color: #FFFBEA !important;
-            border: 2px solid #1A1A1A !important;
-            border-radius: 10px !important;
-            padding: 10px !important;
-            box-shadow: none !important;
-        }
-            
-        /* Subtitle */
-        .subtitle {
-            font-family: 'Baskervville', serif;
-            font-size: 26px;
-            text-align: center;
-            color: #1A1A1A;
-            margin-top: -10px;
-        }
-        .highlight {
-            background-color: #FFD6E0;
-            padding: 2px 8px;
-            border-radius: 4px;
-        }
-
-        /* Buttons – dùng giống recommendations cho chắc */
-div[data-testid="stVerticalBlock"] button{
-    background-color: #D8FF84;
-    color: #1A1A1A;
-    border: 2px solid #1A1A1A;
-    border-radius: 12px;
-    padding: 8px 20px;
-    box-shadow: 3px 3px 0px #FFD6E0;
-    transition: transform 0.15s ease;
-}
-
-div[data-testid="stVerticalBlock"] button > * {
-    font-family: 'Courier Prime', monospace;
-    font-weight: 700;
-    font-size: 18px;
-    color: #1A1A1A;
-}
-
-div[data-testid="stVerticalBlock"] button:hover {
-    background-color: #FFD6E0;
-    box-shadow: 3px 3px 0px #D8FF84;
-    transform: scale(1.03);
-}
-
-
-        /* File uploader */
-        [data-testid="stFileUploader"] {
-            background-color: #D6EFFF;
-            border-radius: 10px;
-            border: 2px solid #1A1A1A;
-            padding: 8px;
-            font-family: 'Courier Prime', monospace;
-        }
-
-        /* DataFrame styling */
-        .stDataFrame {
-            background-color: white;
-            border: 2px solid #1A1A1A;
-            border-radius: 6px;
-            font-family: 'Courier Prime', monospace;
-        }
-
-        /* Result box */
-        .result-box {
-            background-color: #FFFFFF;
-            border: 2px solid #1A1A1A;
-            border-radius: 10px;
-            padding: 20px;
-            font-family: 'Courier Prime', monospace !important;
-            font-weight: bold;
-            font-size: 20px;
-            text-align: center;
-        }
-
-        /* Table header style */
-        th {
-            background-color: #D8FF84 !important;
-            color: #1A1A1A !important;
-            font-family: 'Courier Prime', monospace !important;
-            border: 1px solid #1A1A1A !important;
-        }
-            
-        /* Remove outer container styling */
-        .stTextArea {
-            background-color: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
 
 #API
 API_URL = "https://review-sentiment-app.onrender.com/predict"
@@ -193,43 +169,75 @@ left, center, right = st.columns([1, 6, 1])
 with center:
     col3, col4 = st.columns([2, 1])
     with col3:
-        st.markdown("<div style='font-family:Caveat, cursive; font-size:30px;'>Write your movie review here</div>", unsafe_allow_html=True)
-        raw_text = st.text_area("", placeholder="Text area...", height=200)
+        st.markdown("<div style='font-family:Courier prime, cursive; font-size:30px;'>Write your movie review here</div>", unsafe_allow_html=True)
+        raw_text = st.text_area("", placeholder="Text area...", height=250)
     with col4:
-        st.markdown("<div style='font-family:Caveat, cursive; font-size:30px;'>Upload your review file here</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-family:Courier prime, cursive; font-size:30px;'>Upload your review file here</div>", unsafe_allow_html=True)
         st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
         uploaded_file = st.file_uploader("", type=["csv"])
 
-#Data process, Data display
+#Data process, Data preview display
 df = pd.DataFrame()
 
 left, center, right = st.columns([1, 6, 1])
 with center:
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
+        df_preview = df.copy()
+        df_preview = df_preview.loc[:, ~df_preview.columns.str.contains('^stt$|^Unnamed')]
         st.write("#### Data preview")
-        st.dataframe(df.head())
+        st.dataframe(df_preview.head(), hide_index=True)
 
     elif raw_text:
-        df = pd.DataFrame({"Review": [raw_text]})
+        lines = raw_text.strip().split('\n')
+        df = pd.DataFrame({"Review": lines})
         st.write("#### Your review:")
-        st.dataframe(df)
-    analyse = st.button(label = "Analyse")
+        st.dataframe(df, hide_index=True)
+    Analyze = st.button(label = "Analyze")
 
 #Send Data to API
-if analyse:
+if Analyze:
     #If user import text
     if raw_text and uploaded_file is None:
-        input_data = {"text": [raw_text]}
+        lines = raw_text.strip().split('\n')
+        lines = [line for line in lines if line.strip()]
+        input_data = {"text": lines}
         try:
             result = requests.post(API_URL, json=input_data)
             response_json = result.json()
 
             if isinstance(response_json, list) and len(response_json) > 0:
-                first_result = response_json[0]
-                st.success(f"🎬 Review: **{first_result.get('review','')}**")
-                st.write(f"Prediction: **{first_result.get('pred','unknown').upper()}** "
-                         f"({round(first_result.get('score',0.0),3)})")
+                #Convert list dict to DataFrame
+                first_result = pd.DataFrame(response_json)
+                first_result.reset_index(inplace=True)
+                first_result.rename(columns={"index": "stt"}, inplace=True)
+                first_result["stt"] = first_result["stt"] + 1
+                #Results Display
+                if "pred" in first_result.columns:
+                    counts = first_result["pred"].str.lower().value_counts(dropna=False)
+                    pos = int(counts.get("positive", 0))
+                    neg = int(counts.get("negative", 0))
+            
+                    total = len(first_result)
+                    pos_rate = pos / total if total else 0.0
+                    neg_rate = neg / total if total else 0.0
+                left, center, right = st.columns([1, 6, 1])
+                with center:
+                    st.success("✅ Analysis successful!")
+                    col5, col6 = st.columns([2, 1])
+                    with col5:
+                        st.dataframe(first_result[["stt", "review", "pred", "score"]], hide_index=True)
+                    with col6:
+                        st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
+                        st.markdown(
+                            f"""
+                            <div class="result-box">
+                                POSITIVE: {pos} ({pos_rate:.1%})<br>
+                                NEGATIVE: {neg} ({neg_rate:.1%})
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
             else:
                 left, center, right = st.columns([1, 6, 1])
                 with center:
@@ -280,36 +288,26 @@ if analyse:
                     st.markdown("### 📊 Results Table")
                 left, center, right = st.columns([1, 6, 1])
                 with center:
-                    col5, col6 = st.columns([2, 1])
-                    with col5:
-                        st.dataframe(df_result[["stt", "review", "pred", "score"]])
+                    col7, col8 = st.columns([2, 1])
+                    with col7:
+                        st.dataframe(df_result[["stt", "review", "pred", "score"]], hide_index=True)
 
-                    with col6:
+                    with col8:
                         st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
                         st.markdown(
                             f"""
-                            <div style="
-                                background-color:#FFFFFF;
-                                border:2px solid #1A1A1A;
-                                border-radius:10px;
-                                padding:25px 10px;
-                                text-align:center;
-                                font-family:'Courier Prime', monospace;
-                                font-weight:800;
-                                font-size:18px;
-                                line-height:1.8;
-                                box-shadow:4px 4px 0px #D8FF84;
-                                width:250px;
-                                margin: 0 auto;
-                                position: relative;
-                                top: 40px;">
+                            <div class="result-box">
                                 POSITIVE: {pos} ({pos_rate:.1%})<br>
                                 NEGATIVE: {neg} ({neg_rate:.1%})
                             </div>
                             """,
-                            unsafe_allow_html=True,
+                            unsafe_allow_html=True
                         )
             else:
-                st.error("⚠️ API returned invalid format.")
+                left, center, right = st.columns([1, 6, 1])
+                with center:
+                    st.error("⚠️ API returned invalid format.")
         except Exception as e:
-            st.error(f"🚫 API connection error: {e}")
+            left, center, right = st.columns([1, 6, 1])
+            with center:
+                st.error(f"🚫 API connection error: {e}")
