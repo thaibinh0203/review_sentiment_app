@@ -117,25 +117,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-#Background
-image_path = Path.cwd() / "images" / "BG.jpg"
-
-with open(image_path, "rb") as image_file:
-    encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
-
-image_url = f"data:image/jpeg;base64,{encoded_image}"
-
-st.markdown(f"""
-    <style>
-        body, .stApp {{
-            background-image: url("{image_url}") !important;
-            background-size: cover !important;
-            background-position: center !important;
-            background-repeat: no-repeat !important;
-            background-attachment: fixed !important;
-        }}
-    </style>
-""", unsafe_allow_html=True)
 
 #Navigation
 col_img, col1, col2 = st.columns([2, 2, 2])
