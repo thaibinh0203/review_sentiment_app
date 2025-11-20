@@ -118,7 +118,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 #Background
-image_path = Path.cwd() / "static" / "BG.jpg"
+image_path = Path.cwd() / "images" / "BG.jpg"
 
 with open(image_path, "rb") as image_file:
     encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
@@ -140,7 +140,7 @@ st.markdown(f"""
 #Navigation
 col_img, col1, col2 = st.columns([2, 2, 2])
 with col_img:
-    logo_path = Path.cwd() / "static" / "LOGO.jpg"
+    logo_path = Path.cwd() / "images" / "LOGO.jpg"
     if logo_path.exists():
         st.image(str(logo_path), width=300)
     else:   
