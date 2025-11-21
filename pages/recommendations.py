@@ -57,33 +57,68 @@ st.markdown(f"""
 # ===================== LOGO + NAVIGATION ==========================
 col_img, col1, col2 = st.columns([3, 3, 3])
 
-# vì máy ý bị lỗi =))
-with col_img:
-    if LOGO_PATH.exists():
-        st.image(str(LOGO_PATH), width=250)
-    else:
-        st.error(f"Không tìm thấy logo: {LOGO_PATH}")
 
-col_img, col1, col2 = st.columns([2, 2, 2])
-with col_img:
-    logo_path = Path.cwd() / "images" / "LOGO.png"
-    st.image(str(logo_path), width=300)
+with col_img:    
+     logo_path = Path.cwd() / "images" / "LOGO.jpg"
+     if logo_path.exists():
+         st.image(str(logo_path), width=250)
+     else:
+         st.error(f"Không tìm thấy logo: {logo_path}")
+
 with col1:
-    if st.button("Homepage", use_container_width=True):
-        st.switch_page("homepage.py")            
-
+    st.markdown("""
+    <div style="text-align:center;">
+        <a href="/homepage" target="_self">
+            <button style="
+                background-color:var(--lime);
+                border:2px solid var(--ink);
+                border-radius:16px;
+                height:60px;
+                padding:10px 66px;  
+                font-family:'Courier Prime', monospace;
+                font-weight:700;
+                font-size:20px;
+                line-height:20px;
+                box-shadow:5px 5px 10px 1px var(--pink);">
+                Homepage
+            </button>
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
+ 
 with col2:
-    if st.button("Analyze your reviews, use_container_width=True):
-        st.switch_page("pages/review.py") 
+    st.markdown("""
+    <div style="text-align:center;">
+        <a href="/pages/review" target="_self">
+            <button style="
+                background-color:var(--lime);
+                border:2px solid var(--ink);
+                border-radius:16px;
+                height:60px;
+                padding:10px 30px;
+                font-family:'Courier Prime', monospace;
+                font-weight:700;
+                font-size:20px;
+                line-height:20px;
+                box-shadow:5px 5px 10px 1px var(--pink);">
+                Analyze Movies
+            </button>
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.markdown("""
 <div class="subtitle-box">
     Help you <span class="highlight">Analyze</span> your movies
 </div>
 """, unsafe_allow_html=True)
+with col1:
+    if st.button("Homepage", use_container_width=True):
+        st.switch_page("homepage.py")            
 
-st.markdown("<br><br>", unsafe_allow_html=True)
-
+with col2:
+    if st.button("Analyze Your Reviews", use_container_width=True):
+        st.switch_page("pages/review.py")
 # ======= TITLE =======
 st.markdown("""<style>
 h1.hero{
