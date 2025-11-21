@@ -3,6 +3,136 @@ import pandas as pd
 import requests
 from pathlib import Path
 
+
+
+import pandas as pd
+import numpy as np
+import ast
+from collections import Counter
+import math
+
+# Đọc dữ liệu
+credits = pd.read_csv('tmdb_5000_credits.csv')
+movies = pd.read_csv('tmdb_5000_movies.csv')
+
+# Merge 2 dataset
+movies = movies.merge(credits, left_on='title', right_on='title')
+
+# Chỉ giữ lại các cột cần thiết
+movies = movies[['movie_id', 'title', 'overview', 'genres', 'keywords', 'cast', 'crew']]
+
+# Hàm convert genres, keywords
+def convert(obj):
+    L = []
+    for i in ast.literal_eval(obj):
+        L.append(i['name'])
+    return L
+
+movies['genres'] = movies['genres'].apply(convert)
+movies['keywords'] = movies['keywords'].apply(convert)
+
+# Lấy top 3 diễn viên
+movies['cast'] = movies['cast'].apply(lambda x: [i['name'] for i in ast.literal_eval(x)[:3]])
+
+# Lấy đạo diễn
+movies['crew'] = movies['crew'].apply(lambda x: [i['name'] for i in ast.literal_eval(x) if i['job'] == 'Director'])
+
+# Tạo tags
+movies['tags'] = movies['genres'] + movies['keywords'] + movies['cast'] + movies['crew']
+movies['tags'] = movies['tags'].apply(lambda x: " ".join(x).lower())
+
+# Chỉ giữ lại các cột cuối cùng
+movies = movies[['movie_id', 'title', 'overview', 'tags']]
+
+# Tự triển khai TF-IDF và Cosine Similarity
+class SimpleTFIDF:
+    def __init__(self):
+        self.vocab = {}
+        self.idf = {}
+        self.documents = []
+    
+    def fit_transform(self, documents):
+        """Tính TF-IDF matrix từ danh sách documents"""
+        self.documents = documents
+        n_docs = len(documents)
+        
+        # Xây dựng vocabulary và tính document frequency
+        doc_freq = Counter()
+        
+        for doc in documents:
+            words = doc.split()
+            unique_words = set(words)
+            doc_freq.update(unique_words)
+        
+        # Tạo vocabulary (ánh xạ từ -> index)
+        self.vocab = {word: idx for idx, word in enumerate(doc_freq.keys())}
+        
+        # Tính IDF cho mỗi từ
+        for word, freq in doc_freq.items():
+            self.idf[word] = math.log(n_docs / (freq + 1))  # +1 để tránh chia cho 0
+        
+        # Tính TF-IDF matrix
+        tfidf_matrix = []
+        for doc in documents:
+            words = doc.split()
+            word_count = Counter(words)
+            doc_length = len(words)
+            
+            # Vector TF-IDF cho document hiện tại
+            tfidf_vector = [0] * len(self.vocab)
+            
+            for word, count in word_count.items():
+                if word in self.vocab:
+                    idx = self.vocab[word]
+                    # TF (Term Frequency) - normalized
+                    tf = count / doc_length
+                    # TF-IDF
+                    tfidf_vector[idx] = tf * self.idf[word]
+            
+            tfidf_matrix.append(tfidf_vector)
+        
+        return np.array(tfidf_matrix)
+
+def cosine_similarity_manual(vec1, vec2):
+    """Tính cosine similarity giữa 2 vector"""
+    dot_product = np.dot(vec1, vec2)
+    norm_vec1 = np.linalg.norm(vec1)
+    norm_vec2 = np.linalg.norm(vec2)
+    
+    if norm_vec1 == 0 or norm_vec2 == 0:
+        return 0
+    
+    return dot_product / (norm_vec1 * norm_vec2)
+
+def compute_cosine_similarity_matrix(tfidf_matrix):
+    """Tính ma trận cosine similarity cho tất cả các cặp document"""
+    n = tfidf_matrix.shape[0]
+    cosine_sim = np.zeros((n, n))
+    
+    for i in range(n):
+        for j in range(n):
+            cosine_sim[i][j] = cosine_similarity_manual(tfidf_matrix[i], tfidf_matrix[j])
+    
+    return cosine_sim
+
+# Sử dụng implementation tự code
+tfidf_custom = SimpleTFIDF()
+tfidf_matrix_custom = tfidf_custom.fit_transform(movies['tags'])
+cosine_sim_custom = compute_cosine_similarity_matrix(tfidf_matrix_custom)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # ===================== PATH & KEYS ======================
 LOGO_PATH = Path("images/LOGO.jpg")
 MOVIES_CSV  = "data/tmdb_5000_movies.csv"
@@ -85,8 +215,8 @@ div[data-testid="stVerticalBlock"] button:hover{ transform:scale(1.03); }
 def load_data():
     import ast
     import numpy as np
-    from sklearn.feature_extraction.text import TfidfVectorizer
-    from sklearn.metrics.pairwise import cosine_similarity
+
+  
 
     movies = pd.read_csv(MOVIES_CSV)
     credits = pd.read_csv(CREDITS_CSV)
@@ -125,9 +255,7 @@ def load_data():
     df["tags"] = df["tags"].apply(lambda x: " ".join(x))
     df = df[["movie_id","title","tags"]]
 
-    tfidf = TfidfVectorizer(stop_words="english")
-    vectors = tfidf.fit_transform(df["tags"])
-    similarity = cosine_similarity(vectors)
+    similarity = cosine_sim_custom(df["tags"])
 
     return df.reset_index(drop=True), similarity
 
