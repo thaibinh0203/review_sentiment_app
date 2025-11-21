@@ -28,81 +28,6 @@ def convert(obj):
         L.append(i['name'])
     return L
 
-# Tự triển khai TF-IDF và Cosine Similarity
-class SimpleTFIDF:
-    def __init__(self):
-        self.vocab = {}
-        self.idf = {}
-        self.documents = []
-    
-    def fit_transform(self, documents):
-        """Tính TF-IDF matrix từ danh sách documents"""
-        self.documents = documents
-        n_docs = len(documents)
-        
-        # Xây dựng vocabulary và tính document frequency
-        doc_freq = Counter()
-        
-        for doc in documents:
-            words = doc.split()
-            unique_words = set(words)
-            doc_freq.update(unique_words)
-        
-        # Tạo vocabulary (ánh xạ từ -> index)
-        self.vocab = {word: idx for idx, word in enumerate(doc_freq.keys())}
-        
-        # Tính IDF cho mỗi từ
-        for word, freq in doc_freq.items():
-            self.idf[word] = math.log(n_docs / (freq + 1))  # +1 để tránh chia cho 0
-        
-        # Tính TF-IDF matrix
-        tfidf_matrix = []
-        for doc in documents:
-            words = doc.split()
-            word_count = Counter(words)
-            doc_length = len(words)
-            
-            # Vector TF-IDF cho document hiện tại
-            tfidf_vector = [0] * len(self.vocab)
-            
-            for word, count in word_count.items():
-                if word in self.vocab:
-                    idx = self.vocab[word]
-                    # TF (Term Frequency) - normalized
-                    tf = count / doc_length
-                    # TF-IDF
-                    tfidf_vector[idx] = tf * self.idf[word]
-            
-            tfidf_matrix.append(tfidf_vector)
-        
-        return np.array(tfidf_matrix)
-
-def cosine_similarity_manual(vec1, vec2):
-    """Tính cosine similarity giữa 2 vector"""
-    dot_product = np.dot(vec1, vec2)
-    norm_vec1 = np.linalg.norm(vec1)
-    norm_vec2 = np.linalg.norm(vec2)
-    
-    if norm_vec1 == 0 or norm_vec2 == 0:
-        return 0
-    
-    return dot_product / (norm_vec1 * norm_vec2)
-
-def compute_cosine_similarity_matrix(tfidf_matrix):
-    """Tính ma trận cosine similarity cho tất cả các cặp document"""
-    n = tfidf_matrix.shape[0]
-    cosine_sim = np.zeros((n, n))
-    
-    for i in range(n):
-        for j in range(n):
-            cosine_sim[i][j] = cosine_similarity_manual(tfidf_matrix[i], tfidf_matrix[j])
-    
-    return cosine_sim
-
-# Sử dụng implementation tự code
-tfidf_custom = SimpleTFIDF()
-tfidf_matrix_custom = tfidf_custom.fit_transform(movies['tags'])
-cosine_sim_custom = compute_cosine_similarity_matrix(tfidf_matrix_custom)
 
 
 
@@ -193,6 +118,67 @@ div[data-testid="stVerticalBlock"] button:hover{ transform:scale(1.03); }
 </style>
 """, unsafe_allow_html=True)
 
+# ---------------------------
+# CUSTOM TF-IDF + COSINE SIM
+# ---------------------------
+
+class SimpleTFIDF:
+    def __init__(self):
+        self.vocab = {}
+        self.idf = {}
+    
+    def fit_transform(self, documents):
+        n_docs = len(documents)
+        doc_freq = Counter()
+
+        # Tính document frequency
+        for doc in documents:
+            words = doc.split()
+            doc_freq.update(set(words))
+
+        # tạo vocab
+        self.vocab = {word: idx for idx, word in enumerate(doc_freq.keys())}
+
+        # tính IDF
+        self.idf = {
+            word: math.log(n_docs / (freq + 1))
+            for word, freq in doc_freq.items()
+        }
+
+        # tạo TF-IDF matrix
+        tfidf_matrix = []
+        for doc in documents:
+            words = doc.split()
+            word_count = Counter(words)
+            length = len(words)
+
+            vector = [0] * len(self.vocab)
+            for word, count in word_count.items():
+                if word in self.vocab:
+                    tf = count / length
+                    vector[self.vocab[word]] = tf * self.idf[word]
+            tfidf_matrix.append(vector)
+
+        return np.array(tfidf_matrix)
+
+def cosine_similarity_manual(vec1, vec2):
+    dot = np.dot(vec1, vec2)
+    n1 = np.linalg.norm(vec1)
+    n2 = np.linalg.norm(vec2)
+    if n1 == 0 or n2 == 0:
+        return 0
+    return dot / (n1 * n2)
+
+def compute_cosine_similarity_matrix(matrix):
+    n = matrix.shape[0]
+    sim = np.zeros((n, n))
+    for i in range(n):
+        for j in range(n):
+            sim[i][j] = cosine_similarity_manual(matrix[i], matrix[j])
+    return sim
+
+
+
 
 # ===================== TMDB POSTER ======================
 @st.cache_resource
@@ -239,7 +225,12 @@ def load_data():
     df["tags"] = df["tags"].apply(lambda x: " ".join(x))
     df = df[["movie_id","title","tags"]]
 
-    similarity = cosine_sim_custom(df["tags"])
+    # build TF-IDF
+    tfidf = SimpleTFIDF()
+    tfidf_matrix = tfidf.fit_transform(df["tags"].tolist())
+    
+    # similarity
+    similarity = compute_cosine_similarity_matrix(tfidf_matrix)
 
     return df.reset_index(drop=True), similarity
 
