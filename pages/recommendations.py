@@ -219,7 +219,7 @@ def load_data():
 
     df["tags"] = df["genres"] + df["keywords"] + df["cast"] + df["crew"]
     df["tags"] = df["tags"].apply(lambda x: " ".join(x))
-    df = df[["movie_id","title","tags"]]
+    df = df[["movie_id","title","overview","tags"]]
 
     # ======= DÙNG TF-IDF & COSINE TỰ CODE =======
     tfidf = MyTfidfVectorizer()
