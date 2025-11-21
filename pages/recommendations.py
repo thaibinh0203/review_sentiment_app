@@ -3,43 +3,6 @@ import pandas as pd
 import requests
 from pathlib import Path
 
-
-
-import pandas as pd
-import numpy as np
-import ast
-from collections import Counter
-import math
-
-# Đọc dữ liệu
-MOVIES_CSV  = "data/tmdb_5000_movies.csv"
-CREDITS_CSV = "data/tmdb_5000_credits.csv"
-
-
-# Chỉ giữ lại các cột cần thiết
-movies = movies[['movie_id', 'title', 'overview', 'genres', 'keywords', 'cast', 'crew']]
-
-# Hàm convert genres, keywords
-def convert(obj):
-    L = []
-    for i in ast.literal_eval(obj):
-        L.append(i['name'])
-    return L
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # ===================== PATH & KEYS ======================
 LOGO_PATH = Path("images/LOGO.jpg")
 MOVIES_CSV  = "data/tmdb_5000_movies.csv"
@@ -116,34 +79,36 @@ div[data-testid="stVerticalBlock"] button:hover{ transform:scale(1.03); }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------------------
-# CUSTOM TF-IDF + COSINE SIM
-# ---------------------------
+import ast
+import numpy as np
+from collections import Counter
+import math
 
+# ===================== CUSTOM TF-IDF =====================
 class SimpleTFIDF:
     def __init__(self):
         self.vocab = {}
         self.idf = {}
-    
+
     def fit_transform(self, documents):
         n_docs = len(documents)
         doc_freq = Counter()
 
-        # Tính document frequency
+        # Document frequency (DF)
         for doc in documents:
             words = doc.split()
             doc_freq.update(set(words))
 
-        # tạo vocab
+        # Vocab
         self.vocab = {word: idx for idx, word in enumerate(doc_freq.keys())}
 
-        # tính IDF
+        # IDF
         self.idf = {
             word: math.log(n_docs / (freq + 1))
             for word, freq in doc_freq.items()
         }
 
-        # tạo TF-IDF matrix
+        # TF-IDF matrix
         tfidf_matrix = []
         for doc in documents:
             words = doc.split()
@@ -155,14 +120,17 @@ class SimpleTFIDF:
                 if word in self.vocab:
                     tf = count / length
                     vector[self.vocab[word]] = tf * self.idf[word]
+
             tfidf_matrix.append(vector)
 
         return np.array(tfidf_matrix)
 
-def cosine_similarity_manual(vec1, vec2):
-    dot = np.dot(vec1, vec2)
-    n1 = np.linalg.norm(vec1)
-    n2 = np.linalg.norm(vec2)
+
+# ===================== CUSTOM COSINE =====================
+def cosine_similarity_manual(v1, v2):
+    dot = np.dot(v1, v2)
+    n1 = np.linalg.norm(v1)
+    n2 = np.linalg.norm(v2)
     if n1 == 0 or n2 == 0:
         return 0
     return dot / (n1 * n2)
@@ -175,11 +143,7 @@ def compute_cosine_similarity_matrix(matrix):
             sim[i][j] = cosine_similarity_manual(matrix[i], matrix[j])
     return sim
 
-
-
-
 # ===================== TMDB POSTER ======================
-@st.cache_resource
 @st.cache_resource
 def load_data():
     movies = pd.read_csv(MOVIES_CSV)
@@ -215,20 +179,20 @@ def load_data():
 
     df["crew"] = df["crew"].apply(lambda x: [get_director(x)])
 
-    # build tags
+    # build TAGS
     df["tags"] = df["genres"] + df["keywords"] + df["cast"] + df["crew"]
     df["tags"] = df["tags"].apply(lambda x: " ".join(x))
 
     df = df[["movie_id", "title", "tags"]]
 
-    # --------- CUSTOM TF-IDF + COSINE SIM -----------
+    # ============= CUSTOM TF-IDF =============
     tfidf = SimpleTFIDF()
-    tfidf_matrix = tfidf.fit_transform(df["tags"].tolist())
+    matrix = tfidf.fit_transform(df["tags"].tolist())
 
-    similarity = compute_cosine_similarity_matrix(tfidf_matrix)
+    # ============= CUSTOM COSINE =============
+    similarity = compute_cosine_similarity_matrix(matrix)
 
     return df.reset_index(drop=True), similarity
-
 
 def fetch_poster(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
