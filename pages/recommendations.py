@@ -192,7 +192,7 @@ def load_data():
     # ============= CUSTOM COSINE =============
     similarity = compute_cosine_similarity_matrix(matrix)
     all_titles = movies['title'].tolist()
-    return df.reset_index(drop=True), similarity
+    return df.reset_index(drop=True), similarity, all_titles
 
 def fetch_poster(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
