@@ -182,12 +182,8 @@ def compute_cosine_similarity_matrix(matrix):
 
 # ===================== TMDB POSTER ======================
 @st.cache_resource
+@st.cache_resource
 def load_data():
-    import ast
-    import numpy as np
-
-  
-
     movies = pd.read_csv(MOVIES_CSV)
     credits = pd.read_csv(CREDITS_CSV)
 
@@ -218,24 +214,23 @@ def load_data():
             if i["job"] == "Director":
                 return i["name"]
         return ""
-        
+
     df["crew"] = df["crew"].apply(lambda x: [get_director(x)])
 
+    # build tags
     df["tags"] = df["genres"] + df["keywords"] + df["cast"] + df["crew"]
     df["tags"] = df["tags"].apply(lambda x: " ".join(x))
-    df = df[["movie_id","title","tags"]]
 
-    # build TF-IDF
+    df = df[["movie_id", "title", "tags"]]
+
+    # --------- CUSTOM TF-IDF + COSINE SIM -----------
     tfidf = SimpleTFIDF()
     tfidf_matrix = tfidf.fit_transform(df["tags"].tolist())
-    
-    # similarity
+
     similarity = compute_cosine_similarity_matrix(tfidf_matrix)
 
     return df.reset_index(drop=True), similarity
 
-movies, similarity = load_data()
-all_titles = movies["title"].tolist()
 
 def fetch_poster(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
