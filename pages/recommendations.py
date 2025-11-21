@@ -5,7 +5,8 @@ import pandas as pd
 import requests
 from pathlib import Path
 from base64 import b64encode
-
+import numpy as np
+from collections import Counter
 # ===================== PATH & KEYS ======================
 # LOGO_PATH = Path("images/LOGO.jpg")
 # MOVIES_CSV  = "data/tmdb_5000_movies.csv"
@@ -158,12 +159,72 @@ div[data-testid="stVerticalBlock"] button:hover{
 </style> """, unsafe_allow_html=True)
 
 # ===================== TMDB POSTER ======================
+class MyTfidfVectorizer:
+    def __init__(self):
+        self.vocab_ = {}
+        self.idf_ = None
+
+    def _tokenize(self, doc: str):
+        # tags của bạn dạng "Action Adventure Tom_Hanks ..." nên split theo space là đủ
+        return doc.lower().split()
+
+    def fit_transform(self, docs):
+        """
+        docs: iterable (list/Series) các chuỗi.
+        Trả về: ma trận TF-IDF dạng numpy.ndarray shape (n_docs, n_terms)
+        """
+        # 1. Tokenize từng doc
+        tokenized_docs = [self._tokenize(d) for d in docs]
+
+        # 2. Xây vocab
+        vocab = {}
+        for tokens in tokenized_docs:
+            for t in tokens:
+                if t not in vocab:
+                    vocab[t] = len(vocab)
+        self.vocab_ = vocab
+
+        n_docs = len(tokenized_docs)
+        n_terms = len(vocab)
+
+        # 3. Tính TF (term frequency) & DF (document frequency)
+        X = np.zeros((n_docs, n_terms), dtype=np.float32)
+        df_counts = np.zeros(n_terms, dtype=np.int32)
+
+        for i, tokens in enumerate(tokenized_docs):
+            counts = Counter(tokens)
+            for t, c in counts.items():
+                j = vocab[t]
+                X[i, j] = c
+                df_counts[j] += 1
+
+        # 4. Tính IDF: giống công thức phổ biến của sklearn
+        # idf_j = log((1 + n_docs) / (1 + df_j)) + 1
+        idf = np.log((1.0 + n_docs) / (1.0 + df_counts)) + 1.0
+        self.idf_ = idf
+
+        # 5. TF-IDF = TF * IDF
+        X *= idf
+
+        # (Có thể chuẩn hóa theo độ dài doc nếu muốn giống sklearn hơn,
+        # nhưng ở đây để đơn giản, chuẩn hóa sẽ làm ở bước cosine)
+        return X
+def cosine_similarity_custom(X: np.ndarray) -> np.ndarray:
+    """
+    X: ma trận (n_samples, n_features)
+    Trả về: ma trận similarity (n_samples, n_samples)
+    """
+    # Chuẩn hóa từng vector hàng về norm = 1
+    norms = np.linalg.norm(X, axis=1, keepdims=True)
+    # Tránh chia cho 0
+    norms = np.where(norms == 0, 1e-9, norms)
+    X_norm = X / norms
+
+    # Cosine similarity = X_norm * X_norm.T
+    return X_norm @ X_norm.T
 @st.cache_resource
 def load_data():
     import ast
-    import numpy as np
-    from sklearn.feature_extraction.text import TfidfVectorizer
-    from sklearn.metrics.pairwise import cosine_similarity
 
     movies = pd.read_csv(MOVIES_CSV)
     credits = pd.read_csv(CREDITS_CSV)
@@ -202,12 +263,14 @@ def load_data():
     df["tags"] = df["tags"].apply(lambda x: " ".join(x))
     df = df[["movie_id","title","tags"]]
 
-    tfidf = TfidfVectorizer(stop_words="english")
-    vectors = tfidf.fit_transform(df["tags"])
-    similarity = cosine_similarity(vectors)
+    # ======= DÙNG TF-IDF & COSINE TỰ CODE =======
+    tfidf = MyTfidfVectorizer()
+    # .values để đảm bảo là list/array các chuỗi
+    vectors = tfidf.fit_transform(df["tags"].values)
+
+    similarity = cosine_similarity_custom(vectors)
 
     return df.reset_index(drop=True), similarity
-
 movies, similarity = load_data()
 all_titles = movies["title"].tolist()
 
