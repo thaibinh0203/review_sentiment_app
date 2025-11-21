@@ -271,7 +271,8 @@ def load_data():
     similarity = cosine_similarity_custom(vectors)
 
     return df.reset_index(drop=True), similarity
-
+movies, similarity = load_data()
+all_titles = movies["title"].tolist()
 
 def fetch_poster(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
