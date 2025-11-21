@@ -351,7 +351,7 @@ if run:
             st.markdown('<div style="height: 49px;"></div>', unsafe_allow_html=True)
             left_path = BASE_DIR / "images" / "REC.png"
             try:
-                st.image(left_path, width=550) 
+                st.image(str(left_path), width=550) 
             except FileNotFoundError:
                 st.empty()
 
@@ -359,7 +359,7 @@ if run:
             st.markdown('<div style="height: 30px;"></div>', unsafe_allow_html=True)
             right_path = BASE_DIR / "images" / "MOV.png"
             try:
-                st.image(right_path, width=550) 
+                st.image(str(right_path), width=550) 
             except FileNotFoundError:
                 st.empty()
 
