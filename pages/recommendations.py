@@ -28,22 +28,6 @@ def convert(obj):
         L.append(i['name'])
     return L
 
-movies['genres'] = movies['genres'].apply(convert)
-movies['keywords'] = movies['keywords'].apply(convert)
-
-# Lấy top 3 diễn viên
-movies['cast'] = movies['cast'].apply(lambda x: [i['name'] for i in ast.literal_eval(x)[:3]])
-
-# Lấy đạo diễn
-movies['crew'] = movies['crew'].apply(lambda x: [i['name'] for i in ast.literal_eval(x) if i['job'] == 'Director'])
-
-# Tạo tags
-movies['tags'] = movies['genres'] + movies['keywords'] + movies['cast'] + movies['crew']
-movies['tags'] = movies['tags'].apply(lambda x: " ".join(x).lower())
-
-# Chỉ giữ lại các cột cuối cùng
-movies = movies[['movie_id', 'title', 'overview', 'tags']]
-
 # Tự triển khai TF-IDF và Cosine Similarity
 class SimpleTFIDF:
     def __init__(self):
