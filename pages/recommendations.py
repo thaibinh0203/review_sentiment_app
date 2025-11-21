@@ -191,7 +191,7 @@ def load_data():
 
     # ============= CUSTOM COSINE =============
     similarity = compute_cosine_similarity_matrix(matrix)
-
+    all_titles = movies['title'].tolist()
     return df.reset_index(drop=True), similarity
 
 def fetch_poster(movie_id):
