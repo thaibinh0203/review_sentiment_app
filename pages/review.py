@@ -6,8 +6,15 @@ from pathlib import Path
 
 #Title
 st.set_page_config(page_title="Movie Analytic & Recommendation", page_icon="🎬", layout="wide")
-    
-#Add styles
+
+
+#Background
+image_path = Path.cwd() / "images" / "BG.jpg"
+with open(image_path, "rb") as image_file:
+    encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+image_url = f"data:image/jpeg;base64,{encoded_image}"
+
+#Add styles(CSS)
 st.markdown("""
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,10 +23,10 @@ st.markdown("""
 
     <style>
     /* Root & Layout */
-    :root{ --bg:#FCFAF5; --ink:#1A1A1A; --lime:#D8FF84; --pink:#FFD6E0; --blue:#D6EFFF; }
+    :root{ --ink:#1A1A1A; --lime:#D8FF84; --pink:#FFD6E0; --blue:#D6EFFF; }
 
     [data-testid="stAppViewContainer"]{
-        background:var(--bg);
+        background: transparent !important;
     }
 
     .block-container{
@@ -67,7 +74,7 @@ st.markdown("""
     }
 
     /* Textarea */
-    div[data-testid="stTextArea"] textarea{
+    div[data-testid="NoextArea"] textarea{
         font-family:'Baskervville', cursive !important;
         font-size:20px !important;
         color:var(--ink) !important;
@@ -114,18 +121,62 @@ st.markdown("""
         transform:scale(1.03);
         box-shadow:5px 5px 10px 1px var(--pink);
     }
+    div[data-testid="stVerticalBlock"] button {
+        background-color: var(--lime) !important;
+        opacity: 1 !important;
+        backdrop-filter: none !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
+st.markdown(f"""
+    <style>
+    [data-testid="stAppViewContainer"] {{
+        background: url("{image_url}") no-repeat center center fixed !important;
+        background-size: cover !important;
+    }}
+
+    [data-testid="stHeader"] {{
+        background: rgba(0,0,0,0) !important;
+    }}
+    </style>
+""", unsafe_allow_html=True)
+
+#Alerts
+def show_alert(message: str, kind: str = "info"):
+    #Colors
+    colors = {
+        "info": "#e8f4fd",
+        "success": "#e6f4ea",
+        "warning": "#fff4e5",
+        "error": "#fdecea"
+    }
+    color = colors.get(kind.lower(), "#e8f4fd")
+
+    # HTML alert
+    alert_html = f"""
+    <div style="
+        position: relative;
+        padding: 16px;
+        margin: 12px 0;
+        border-radius: 8px;
+        background-color: {color};
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        z-index: 9999;
+        isolation: isolate;
+        font-weight: 500;
+        font-size: 18px;
+    ">
+        {message}
+    </div>
+    """
+    st.markdown(alert_html, unsafe_allow_html=True)
 
 #Navigation
 col_img, col1, col2 = st.columns([2, 2, 2])
 with col_img:
-    logo_path = Path.cwd() / "images" / "LOGO.jpg"
-    if logo_path.exists():
-        st.image(str(logo_path), width=300)
-    else:   
-        st.error(f"Không tìm thấy logo: {logo_path}")
+    logo_path = Path.cwd() / "images" / "LOGO.png"
+    st.image(str(logo_path), width=300)
 with col1:
     if st.button("Homepage", use_container_width=True):
         st.switch_page("homepage.py")            
@@ -140,7 +191,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("---")
+st.markdown("   ")
 
 #API
 API_URL = "https://review-sentiment-app.onrender.com/predict"
@@ -165,7 +216,7 @@ with center:
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
         df_preview = df.copy()
-        df_preview = df_preview.loc[:, ~df_preview.columns.str.contains('^stt$|^Unnamed')]
+        df_preview = df_preview.loc[:, ~df_preview.columns.str.contains('^No$|^Unnamed')]
         st.write("#### Data preview")
         st.dataframe(df_preview.head(), hide_index=True)
 
@@ -177,22 +228,29 @@ with center:
     Analyze = st.button(label = "Analyze")
 
 #Send Data to API
+alert_placeholder = st.empty()
 if Analyze:
     #If user import text
     if raw_text and uploaded_file is None:
         lines = raw_text.strip().split('\n')
         lines = [line for line in lines if line.strip()]
         input_data = {"text": lines}
+        
+        with alert_placeholder:
+            left, center, right = st.columns([1, 6, 1])
+            with center:
+                show_alert(f"⏳ Sending data to API... please wait a moment.", kind="info")
         try:
             result = requests.post(API_URL, json=input_data)
             response_json = result.json()
-
+            alert_placeholder.empty()
+            
             if isinstance(response_json, list) and len(response_json) > 0:
                 #Convert list dict to DataFrame
                 first_result = pd.DataFrame(response_json)
                 first_result.reset_index(inplace=True)
-                first_result.rename(columns={"index": "stt"}, inplace=True)
-                first_result["stt"] = first_result["stt"] + 1
+                first_result.rename(columns={"index": "No"}, inplace=True)
+                first_result["No"] = first_result["No"] + 1
                 #Results Display
                 if "pred" in first_result.columns:
                     counts = first_result["pred"].str.lower().value_counts(dropna=False)
@@ -204,12 +262,32 @@ if Analyze:
                     neg_rate = neg / total if total else 0.0
                 left, center, right = st.columns([1, 6, 1])
                 with center:
-                    st.success("✅ Analysis successful!")
+                    show_alert(f"✅ Analyzis successful!", kind="success")
+                    st.markdown("### Results Table")
                     col5, col6 = st.columns([2, 1])
                     with col5:
-                        st.dataframe(first_result[["stt", "review", "pred", "score"]], hide_index=True)
+                        st.dataframe(first_result[["No", "review", "pred", "score"]], hide_index=True)
                     with col6:
-                        st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
+                        like = Path.cwd() / "images" / "LIKE.gif"
+                        disklike = Path.cwd() / "images" / "DISLIKE.gif"
+                        if pos_rate >= 0.5:
+                            st.markdown(
+                                f"""
+                                <div style="text-align:center;">
+                                    <img src="data:image/gif;base64,{base64.b64encode(open(like, "rb").read()).decode()}" width="200">
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
+                        else:
+                            st.markdown(
+                                f"""
+                                <div style="text-align:center;">
+                                    <img src="data:image/gif;base64,{base64.b64encode(open(disklike, "rb").read()).decode()}" width="200">
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
                         st.markdown(
                             f"""
                             <div class="result-box">
@@ -222,11 +300,11 @@ if Analyze:
             else:
                 left, center, right = st.columns([1, 6, 1])
                 with center:
-                    st.error("⚠️ API returned invalid format.")
+                    show_alert(f"⚠️ API returned invalid format.", kind="warning")
         except Exception as e:
             left, center, right = st.columns([1, 6, 1])
             with center:
-                st.error(f"🚫 API connection error: {e}")
+                show_alert(f"🚫 API connection error: {e}", kind="error")
 
     #If user import file
     elif uploaded_file is not None:
@@ -236,24 +314,25 @@ if Analyze:
             texts = df[text_col].astype(str).tolist()
 
             input_data = {"text": texts}
-            left, center, right = st.columns([1, 6, 1])
-            with center:
-                st.info("⏳ Sending data to API... please wait a moment.")
+            with alert_placeholder:
+                left, center, right = st.columns([1, 6, 1])
+                with center:
+                    show_alert(f"⏳ Sending data to API... please wait a moment.", kind="info")
             result = requests.post(API_URL, json=input_data, timeout=60)
-
             response_json = result.json()
+            alert_placeholder.empty()
 
             if isinstance(response_json, list):
                 #Convert list dict to DataFrame
                 df_result = pd.DataFrame(response_json)
                 df_result.reset_index(inplace=True)
-                df_result.rename(columns={"index": "stt"}, inplace=True)
-                df_result["stt"] = df_result["stt"] + 1
+                df_result.rename(columns={"index": "No"}, inplace=True)
+                df_result["No"] = df_result["No"] + 1
 
                 #Results Display
                 left, center, right = st.columns([1, 6, 1])
                 with center:
-                    st.success("✅ Analysis successful!")
+                    show_alert(f"✅ Analyzis successful!", kind="success")
                 if "pred" in df_result.columns:
                     counts = df_result["pred"].str.lower().value_counts(dropna=False)
                     pos = int(counts.get("positive", 0))
@@ -266,15 +345,34 @@ if Analyze:
 
                 left, center, right = st.columns([1, 6, 1])
                 with center:
-                    st.markdown("### 📊 Results Table")
+                    st.markdown("### Results Table")
                 left, center, right = st.columns([1, 6, 1])
                 with center:
                     col7, col8 = st.columns([2, 1])
                     with col7:
-                        st.dataframe(df_result[["stt", "review", "pred", "score"]], hide_index=True)
+                        st.dataframe(df_result[["No", "review", "pred", "score"]], hide_index=True)
 
                     with col8:
-                        st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
+                        like = Path.cwd() / "images" / "LIKE.gif"
+                        disklike = Path.cwd() / "images" / "DISLIKE.gif"
+                        if pos_rate >= 0.5:
+                            st.markdown(
+                                f"""
+                                <div style="text-align:center;">
+                                    <img src="data:image/gif;base64,{base64.b64encode(open(like, "rb").read()).decode()}" width="200">
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
+                        else:
+                            st.markdown(
+                                f"""
+                                <div style="text-align:center;">
+                                    <img src="data:image/gif;base64,{base64.b64encode(open(disklike, "rb").read()).decode()}" width="200">
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
                         st.markdown(
                             f"""
                             <div class="result-box">
@@ -287,8 +385,8 @@ if Analyze:
             else:
                 left, center, right = st.columns([1, 6, 1])
                 with center:
-                    st.error("⚠️ API returned invalid format.")
+                    show_alert(f"⚠️ API returned invalid format.", kind="warning")
         except Exception as e:
             left, center, right = st.columns([1, 6, 1])
             with center:
-                st.error(f"🚫 API connection error: {e}")
+                show_alert(f"🚫 API connection error: {e}", kind="error")
