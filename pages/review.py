@@ -74,12 +74,12 @@ st.markdown("""
     }
 
     /* Textarea */
-    div[data-testid="NoextArea"] textarea{
+    div[data-testid="stTextArea"] textarea {
         font-family:'Baskervville', cursive !important;
         font-size:20px !important;
         color:var(--ink) !important;
         background-color:#FFFBEA !important;
-        border:2px solid var(--ink) !important;
+        border: 2px solid #000 !important;
         border-radius:10px !important;
         padding:10px !important;
     }
@@ -100,6 +100,18 @@ st.markdown("""
         margin:0 auto;
         position:relative;
         top:40px;
+    }
+    
+    /* Dataframe */
+    div[data-testid="stDataFrame"] table {
+        border: 2px solid #000 !important;
+        border-collapse: collapse !important;
+    }
+
+    div[data-testid="stDataFrame"] table th, 
+    div[data-testid="stDataFrame"] table td {
+        border: 1px solid #000 !important;
+        padding: 8px 12px !important;
     }
 
     /* Buttons */
@@ -155,10 +167,11 @@ def show_alert(message: str, kind: str = "info"):
 
     # HTML alert
     alert_html = f"""
-    <div style="
+    <div class="alert" style="
         position: relative;
         padding: 16px;
         margin: 12px 0;
+        border: 2px solid #000 !important;
         border-radius: 8px;
         background-color: {color};
         box-shadow: 0 4px 12px rgba(0,0,0,0.12);
@@ -191,7 +204,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("   ")
+st.markdown("<br><br>", unsafe_allow_html=True)
 
 #API
 API_URL = "https://review-sentiment-app.onrender.com/predict"
@@ -204,7 +217,7 @@ with center:
         st.markdown("<div style='font-family:Courier prime, cursive; font-size:30px;'>Write your movie review here</div>", unsafe_allow_html=True)
         raw_text = st.text_area("", placeholder="Text area...", height=250)
     with col4:
-        st.markdown("<div style='font-family:Courier prime, cursive; font-size:30px;'>Upload your review file here</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-family:Courier prime, cursive; font-size:30px;'>Your review file</div>", unsafe_allow_html=True)
         st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
         uploaded_file = st.file_uploader("", type=["csv"])
 
