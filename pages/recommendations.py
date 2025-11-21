@@ -59,7 +59,7 @@ col_img, col1, col2 = st.columns([3, 3, 3])
 
 
 with col_img:    
-     logo_path = Path.cwd() / "images" / "LOGO.jpg"
+     logo_path = Path.cwd() / "images" / "LOGO.png"
      if logo_path.exists():
          st.image(str(logo_path), width=250)
      else:
