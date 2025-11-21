@@ -15,8 +15,6 @@ import math
 MOVIES_CSV  = "data/tmdb_5000_movies.csv"
 CREDITS_CSV = "data/tmdb_5000_credits.csv"
 
-# Merge 2 dataset
-movies = movies.merge(credits, left_on='title', right_on='title')
 
 # Chỉ giữ lại các cột cần thiết
 movies = movies[['movie_id', 'title', 'overview', 'genres', 'keywords', 'cast', 'crew']]
