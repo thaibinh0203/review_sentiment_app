@@ -337,31 +337,27 @@ if run:
     else:
         # st.markdown('<div class="gallery-title">Recommended movies:</div>', unsafe_allow_html=True)
         col_left, col_center, col_right = st.columns([3, 1.5, 3])
-
         with col_center:
             st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
             center_path = BASE_DIR / "images" / "POINTING.gif"
-            try:
-                # Dùng use_container_width=True để GIF lấp đầy cột giữa (kích thước 1)
-                st.image(center_path, use_container_width=True)
-            except FileNotFoundError:
-                st.error(f"Lỗi: Không tìm thấy file GIF tại đường dẫn: {center_path}")
-
+            if center_path.exists():
+                st.image(str(center_path), use_container_width=True)
+            else:
+                st.error(f"Không tìm thấy POINTING.gif tại: {center_path}")
+        
         with col_left:
             st.markdown('<div style="height: 49px;"></div>', unsafe_allow_html=True)
             left_path = BASE_DIR / "images" / "REC.png"
-            try:
-                st.image(str(left_path), width=550) 
-            except FileNotFoundError:
-                st.empty()
-
+            if left_path.exists():
+                st.image(str(left_path), width=550)
+        
         with col_right:
             st.markdown('<div style="height: 30px;"></div>', unsafe_allow_html=True)
             right_path = BASE_DIR / "images" / "MOV.png"
-            try:
-                st.image(str(right_path), width=550) 
-            except FileNotFoundError:
-                st.empty()
+            if right_path.exists():
+                st.image(str(right_path), width=550)
+
+
 
         rows = [recs[:5], recs[5:10]]
 
