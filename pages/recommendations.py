@@ -1,163 +1,191 @@
+# C:\Users\pv\Downloads\NEU\Python\venv\Homepage_Combine\pages
+
 import streamlit as st
 import pandas as pd
 import requests
 from pathlib import Path
-import ast
-import numpy as np
-from collections import Counter
-import math
+from base64 import b64encode
 
 # ===================== PATH & KEYS ======================
-LOGO_PATH = Path("images/LOGO.jpg")
-MOVIES_CSV  = "data/tmdb_5000_movies.csv"
-CREDITS_CSV = "data/tmdb_5000_credits.csv"
+# LOGO_PATH = Path("images/LOGO.jpg")
+# MOVIES_CSV  = "data/tmdb_5000_movies.csv"
+# CREDITS_CSV = "data/tmdb_5000_credits.csv"
+
+# TMDB_API_KEY = "32be515044e4f084aa5b020364d6e780"
+
+# ver máy ý (vì bị lỗi)
+import os
+BASE_DIR = Path(os.path.abspath(__file__)).parents[1]
+LOGO_PATH = BASE_DIR / "images" / "LOGO.png"
+
+MOVIES_CSV  = BASE_DIR / "data" / "tmdb_5000_movies.csv"
+CREDITS_CSV = BASE_DIR / "data" / "tmdb_5000_credits.csv"
 
 TMDB_API_KEY = "32be515044e4f084aa5b020364d6e780"
+
+BG_PATH = BASE_DIR / "images" / "BG.jpg"
+with open(BG_PATH, "rb") as f:
+    encoded = b64encode(f.read()).decode()
 
 # ===================== PAGE CONFIG ======================
 st.set_page_config(page_title="RCM • Movie Recommender", layout="wide")
 
-# ===================== FONTS + THEME CSS =================
+# ===================== FONTS + CONTAINER =================
 st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --bg:#FCFAF5; --ink:#1A1A1A; --lime:#D8FF84; --pink:#FFD6E0; --blue:#D6EFFF;
-}
-.block-container{ max-width:1400px; padding-top:12px; }
-[data-testid="stAppViewContainer"]{ background:var(--bg); }
+:root{ --bg:#FCFAF5; --ink:#1A1A1A; --lime:#D8FF84; --pink:#FFD6E0; --blue:#D6EFFF; }
+# [data-testid="stAppViewContainer"]{ background:var(--bg); }
+.block-container{ max-width:1400px; padding-top:50px; }
 
-/* Header */
-.header-wrap{ display:flex; align-items:center; justify-content:space-between; gap:24px; }
-.brand{ display:flex; align-items:center; gap:18px; }
+</style>""", unsafe_allow_html=True)
 
-/* Buttons */
-.top-cta{
-  display:flex; justify-content:center; gap:28px;
-  margin:10px 0 6px;
-}
-.btn-pill{
-  display:inline-flex; align-items:center; justify-content:center;
-  height:56px; min-width:260px; padding:0 22px;
-  border:3px solid var(--ink); border-radius:16px; background:var(--lime);
-  color:var(--ink); font-family:'Courier Prime',monospace; font-weight:700; font-size:18px;
-  box-shadow:8px 8px 12px 2px var(--pink); text-decoration:none; transition:transform .15s ease;
-}
-.btn-pill:hover{ transform:scale(1.03); background:#E8FF9A; }
-
-/* Title */
-h1.hero{
-  text-align:center; margin:12px 0 14px;
-  font-family:'Baskervville',serif; font-weight:700; font-size:44px; color:var(--ink);
-}
-.hero .hi{ background:var(--pink); padding:0 8px; border-radius:6px; }
-
-/* Inputs */
-div[data-baseweb="select"]{ border:3px solid var(--ink); border-radius:16px; }
-.stSelectbox > div > div{ height:60px; }
-.stSelectbox label{ display:none; }
-
-div[data-testid="stVerticalBlock"] button{
-  height:60px; border:3px solid var(--ink); border-radius:16px; background:var(--lime);
-  color:var(--ink); font-family:'Courier Prime',monospace; font-weight:700;
-  box-shadow:5px 5px 10px 1px var(--pink); transition:transform .15s ease;
-}
-div[data-testid="stVerticalBlock"] button:hover{ transform:scale(1.03); }
-
-/* Gallery */
-.gallery-title{
-  text-align:center; font-family:'Courier Prime',monospace; font-weight:700;
-  font-size:26px; margin:10px 0 18px; color:var(--ink);
-}
-.card{ text-align:center; }
-.card img{
-  height:350px; width:auto; border-radius:16px; box-shadow:0 6px 12px rgba(0,0,0,.25);
-  display:block; margin:0 auto;
-}
-.card .caption{
-  margin-top:12px; font-family:'Courier Prime',monospace; font-weight:700; font-size:14px;
-  letter-spacing:.3px; color:var(--ink); text-transform:uppercase;
-}
+st.markdown(f"""
+<style>
+[data-testid="stAppViewContainer"] {{
+    background-image: url("data:image/png;base64,{encoded}");
+    background-repeat: repeat;
+    background-size: cover;
+}}
 </style>
 """, unsafe_allow_html=True)
 
-# ===================== CUSTOM TF-IDF =====================
-class SimpleTFIDF:
-    def __init__(self):
-        self.vocab = {}
-        self.idf = {}
+# ===================== LOGO + NAVIGATION ==========================
+col_img, col1, col2 = st.columns([3, 3, 3])
 
-    def fit_transform(self, documents):
-        n_docs = len(documents)
-        doc_freq = Counter()
+# vì máy ý bị lỗi =))
+with col_img:
+    if LOGO_PATH.exists():
+        st.image(str(LOGO_PATH), width=250)
+    else:
+        st.error(f"Không tìm thấy logo: {LOGO_PATH}")
 
-        for doc in documents:
-            words = doc.split()
-            doc_freq.update(set(words))
+# with col_img:    
+#     logo_path = Path.cwd() / "images" / "LOGO.jpg"
+#     if logo_path.exists():
+#         st.image(str(logo_path), width=250)
+#     else:
+#         st.error(f"Không tìm thấy logo: {logo_path}")
 
-        self.vocab = {word: idx for idx, word in enumerate(doc_freq.keys())}
+with col1:
+    st.markdown("""
+    <div style="text-align:center;">
+        <a href="/homepage" target="_self">
+            <button style="
+                background-color:var(--lime);
+                border:2px solid var(--ink);
+                border-radius:16px;
+                height:60px;
+                padding:10px 66px;  
+                font-family:'Courier Prime', monospace;
+                font-weight:700;
+                font-size:20px;
+                line-height:20px;
+                box-shadow:5px 5px 10px 1px var(--pink);">
+                Homepage
+            </button>
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
+ 
+with col2:
+    st.markdown("""
+    <div style="text-align:center;">
+        <a href="/pages/review" target="_self">
+            <button style="
+                background-color:var(--lime);
+                border:2px solid var(--ink);
+                border-radius:16px;
+                height:60px;
+                padding:10px 30px;
+                font-family:'Courier Prime', monospace;
+                font-weight:700;
+                font-size:20px;
+                line-height:20px;
+                box-shadow:5px 5px 10px 1px var(--pink);">
+                Analyze Movies
+            </button>
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
 
-        self.idf = {
-            word: math.log(n_docs / (freq + 1))
-            for word, freq in doc_freq.items()
-        }
+# ======= TITLE =======
+st.markdown("""<style>
+h1.hero{
+    text-align:center; color:var(--ink);
+    font-family:'Baskervville',serif; font-weight:500; font-size:60px; 
+} 
+.hero .hi{ background:var(--pink); padding:0 8px; border-radius:6px; } 
+</style>
 
-        tfidf_matrix = []
-        for doc in documents:
-            words = doc.split()
-            word_count = Counter(words)
-            length = len(words)
-            vector = [0] * len(self.vocab)
+<h1 class="hero">Your <span class="hi">next</span> movie</h1>
+""", unsafe_allow_html=True)
 
-            for word, count in word_count.items():
-                if word in self.vocab:
-                    tf = count / length
-                    vector[self.vocab[word]] = tf * self.idf[word]
+# ============== INPUT BOX + RECOMMEND BUTTON + GALLERY ================           
+st.markdown("""<style>
+/* ======= INPUT BOX ======= */
+.stSelectbox label { display:none; }
+.stSelectbox > div > div { height:60px; }
 
-            tfidf_matrix.append(vector)
+/* Style box */
+div[data-baseweb="select"] {
+    background-color: var(--bg) !important;  /* Keep your preferred blue */
+    border: 3px solid var(--ink) !important;
+    border-radius: 11px !important;
+}
+/* Text inside */
+div[data-baseweb="select"] * {
+    background-color: transparent !important;
+    font-family: 'Courier Prime', monospace !important;
+    font-size: 17px !important;
+    align-items: center;
+}
 
-        return np.array(tfidf_matrix)
+/* ======= RECOMMEND BUTTON ======= */
+div[data-testid="stVerticalBlock"] button{
+    height:65px; border:3px solid var(--ink); border-radius:11px; background:var(--lime);
+    box-shadow:5px 5px 10px 1px var(--pink); transition:transform .15s ease; align-items:center;
+}
+div[data-testid="stVerticalBlock"] button > * {
+    color:var(--ink); font-family:'Courier Prime',monospace; font-weight:700; font-size:20px;
+}
+div[data-testid="stVerticalBlock"] button:hover{ 
+    background:var(--lime); box-shadow:5px 5px 10px 1px var(--pink); transform:scale(1.03); 
+}
+</style> """, unsafe_allow_html=True)
 
-
-# ===================== CUSTOM COSINE =====================
-def cosine_similarity_manual(v1, v2):
-    dot = np.dot(v1, v2)
-    n1 = np.linalg.norm(v1)
-    n2 = np.linalg.norm(v2)
-    if n1 == 0 or n2 == 0:
-        return 0
-    return dot / (n1 * n2)
-
-def compute_cosine_similarity_matrix(matrix):
-    n = matrix.shape[0]
-    sim = np.zeros((n, n))
-    for i in range(n):
-        for j in range(n):
-            sim[i][j] = cosine_similarity_manual(matrix[i], matrix[j])
-    return sim
-
-# ===================== LOAD DATA (FIXED) =====================
+# ===================== TMDB POSTER ======================
 @st.cache_resource
 def load_data():
+    import ast
+    import numpy as np
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+
     movies = pd.read_csv(MOVIES_CSV)
     credits = pd.read_csv(CREDITS_CSV)
 
     df = movies.merge(credits, on="title")
 
     def convert(obj):
-        return [i["name"] for i in ast.literal_eval(obj)]
+        L = []
+        for i in ast.literal_eval(obj):
+            L.append(i["name"])
+        return L
 
     df["genres"] = df["genres"].apply(convert)
     df["keywords"] = df["keywords"].apply(convert)
 
     def convert_cast(obj):
         L = []
+        counter = 0
         for i in ast.literal_eval(obj):
-            if len(L) < 3:
+            if counter < 3:
                 L.append(i["name"])
+                counter += 1
         return L
 
     df["cast"] = df["cast"].apply(convert_cast)
@@ -167,27 +195,22 @@ def load_data():
             if i["job"] == "Director":
                 return i["name"]
         return ""
-
+        
     df["crew"] = df["crew"].apply(lambda x: [get_director(x)])
 
     df["tags"] = df["genres"] + df["keywords"] + df["cast"] + df["crew"]
     df["tags"] = df["tags"].apply(lambda x: " ".join(x))
+    df = df[["movie_id","title","tags"]]
 
-    df = df[["movie_id", "title", "tags"]]
+    tfidf = TfidfVectorizer(stop_words="english")
+    vectors = tfidf.fit_transform(df["tags"])
+    similarity = cosine_similarity(vectors)
 
-    tfidf = SimpleTFIDF()
-    matrix = tfidf.fit_transform(df["tags"].tolist())
+    return df.reset_index(drop=True), similarity
 
-    similarity = compute_cosine_similarity_matrix(matrix)
-    all_titles = df["title"].tolist()   # FIX
+movies, similarity = load_data()
+all_titles = movies["title"].tolist()
 
-    return df.reset_index(drop=True), similarity, all_titles
-
-# === ACTUALLY LOAD DATA HERE ===
-movies, similarity, all_titles = load_data()
-
-
-# ===================== TMDB FETCH ======================
 def fetch_poster(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
     data = requests.get(url).json()
@@ -197,88 +220,154 @@ def fetch_poster(movie_id):
 def fetch_trailer(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}/videos?api_key={TMDB_API_KEY}"
     data = requests.get(url).json()
+
     for v in data.get("results", []):
         if v.get("type") == "Trailer" and v.get("site") == "YouTube":
-            return f"https://www.youtube.com/watch?v={v.get('key')}"
+            key = v.get("key")
+            return f"https://www.youtube.com/watch?v={key}"
     return None
 
-
-# ===================== RECOMMENDER (FIXED) =====================
+# ===================== RECOMMEND GALLERY ===================
 def recommend(title, top_k=10):
+    # vị trí phim được chọn
     index = movies[movies["title"] == title].index[0]
+    # sắp xếp theo độ tương tự giảm dần
     distances = sorted(
         list(enumerate(similarity[index])),
         reverse=True,
         key=lambda x: x[1]
     )
+    # bỏ phần tử đầu tiên (chính nó), lấy top_k tiếp theo
     picks = []
     for i, _score in distances[1: top_k + 1]:
         row = movies.iloc[i]
         picks.append((row["title"], row["movie_id"]))
     return picks
 
-
-# ===================== UI START =====================
-st.markdown('<div class="header-wrap">', unsafe_allow_html=True)
-st.markdown('<div class="brand">', unsafe_allow_html=True)
-
-if LOGO_PATH.exists():
-    st.image(str(LOGO_PATH), width=140)
-
-st.markdown('</div></div>', unsafe_allow_html=True)
-
-col1, col2 = st.columns([2, 2])
-st.markdown("""
-<style>
-div[data-testid="stButton"] > button {
-    background-color:#D8FF84;
-    border:3px solid #1A1A1A;
-    border-radius:12px;
-    padding:12px 20px;
-    font-family:'Courier Prime', monospace;
-    font-weight:700;
-    font-size:24px;
-    box-shadow:6px 6px 0px #FFD6E0;
-    color:#1A1A1A;
-}
-div[data-testid="stButton"] > button:hover {
-    background-color:#E8FF9A;
-}
-</style>
-""", unsafe_allow_html=True)
-
-with col1:
-    if st.button("Homepage", use_container_width=True):
-        st.switch_page("homepage.py")
-
-with col2:
-    if st.button("Analyze Movies", use_container_width=True):
-        st.switch_page("pages/review.py")
-
-st.markdown('<h1 class="hero">Your <span class="hi">next</span> movie</h1>', unsafe_allow_html=True)
-
-# ===================== INPUT =====================
-c1, cbtn, _ = st.columns([6, 2, 1])
+# ===================== INPUT + BUTTON ===================
+c1, cbtn, _ = st.columns([6, 2, 0.1])
 
 with c1:
-    selected = st.selectbox("", all_titles, index=0)
-
+    selected = st.selectbox("", all_titles, index=None, placeholder="Select a movie")
 with cbtn:
     run = st.button("Recommend", use_container_width=True)
 
+if run and not selected:
+    st.markdown('<div class="gallery-title">Please select a movie first!</div>', unsafe_allow_html=True)
+    run = False
 
-# ===================== RESULTS =====================
+# ===================== GALLERY STYLES ===================
+st.markdown(""" 
+<style>
+/* ======= GALLERY ======= */
+.gallery-title{
+    text-align:center; font-family:'Courier Prime',monospace; font-weight:700;
+    font-size:26px; margin:10px 0 20px; color:var(--ink);
+} 
+.card{ text-align:center; margin-bottom:30px; position:relative; }
+
+/* 1. CARD IMAGE & LINK STYLES */
+.card-link {
+    display: block; /* link bao phủ ảnh */
+    position: relative; /* Cần thiết để icon (absolute) định vị được */
+    text-decoration: none; /* Loại bỏ gạch chân link */
+}
+
+.card > .card-img, /* Poster nằm trực tiếp trong .card (No trailer) */
+.card-link .card-img { /* Poster nằm trong thẻ link (Có trailer) */
+    aspect-ratio: 2 / 3; width:auto; border-radius:16px; box-shadow:0 6px 12px rgba(0,0,0,.25) !important;
+    display:block; margin:0 auto; object-fit:cover; transition: transform .25s ease;
+}
+.card > .card-img:hover, 
+.card-link:hover .card-img { transform: scale(1.05); }
+
+.card .caption{
+    margin-top:12px; font-family:'Courier Prime',monospace; font-weight:700; font-size:14px;
+    letter-spacing:0.5px; color:var(--ink); text-transform:uppercase;
+}
+    
+/* 2. OVERLAY ICONS/TEXT STYLES */
+.trailer-btn {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); 
+    min-width: 80px; height: auto;
+    padding: 8px 15px;
+    border-radius: 10px;
+        
+    color: white !important;
+    font-size: 14px;
+    font-family: 'Courier Prime', monospace;
+    font-weight: 700;
+    letter-spacing: 1px;
+        
+    display: inline-flex; /* Dùng flex để căn giữa dọc nội dung */
+    align-items: center !important; 
+    justify-content: center;
+    white-space: nowrap;
+        
+    opacity: 0;
+    transition: opacity .25s ease, transform .25s ease;
+    pointer-events: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    z-index: 10;
+            
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(0.5px);
+}
+
+.trailer-btn.trailer-active, .no-trailer-active { 
+    background: rgba(0,0,0,0.55); /* nền đen mờ */
+    backdrop-filter: blur(0.5px);
+}
+
+.card-link:hover .trailer-btn, /* Cho trường hợp có trailer (bọc trong thẻ a) */
+.card:hover .trailer-btn { /* Cho trường hợp không có trailer (bọc trong thẻ div .card) */
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1.08); 
+}
+</style>
+""", unsafe_allow_html=True)   
+
+# ===================== RESULTS ==========================
+import textwrap
 if run:
     recs = recommend(selected, top_k=10)
-
     if not recs:
-        st.warning("No recommendation found.")
+        st.warning("No recommendation found for this title.")
     else:
-        st.markdown('<div class="gallery-title">Recommended movies:</div>', unsafe_allow_html=True)
+        # st.markdown('<div class="gallery-title">Recommended movies:</div>', unsafe_allow_html=True)
+        col_left, col_center, col_right = st.columns([3, 1.5, 3])
+
+        with col_center:
+            st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
+            center_path = "../images/POINTING.gif"
+            try:
+                # Dùng use_container_width=True để GIF lấp đầy cột giữa (kích thước 1)
+                st.image(center_path, use_container_width=True)
+            except FileNotFoundError:
+                st.error(f"Lỗi: Không tìm thấy file GIF tại đường dẫn: {center_path}")
+
+        with col_left:
+            st.markdown('<div style="height: 49px;"></div>', unsafe_allow_html=True)
+            left_path = "../images/REC.png"
+            try:
+                st.image(left_path, width=550) 
+            except FileNotFoundError:
+                st.empty()
+
+        with col_right:
+            st.markdown('<div style="height: 30px;"></div>', unsafe_allow_html=True)
+            right_path = "../images/MOV.png"
+            try:
+                st.image(right_path, width=550) 
+            except FileNotFoundError:
+                st.empty()
+
         rows = [recs[:5], recs[5:10]]
 
         for row in rows:
             cols = st.columns(5, gap="large")
+
             for col, (title, mid) in zip(cols, row):
                 with col:
                     poster = fetch_poster(int(mid))
@@ -286,34 +375,26 @@ if run:
 
                     if poster:
                         if trailer:
-                            trailer_html = f"""
-                                <a href="{trailer}" target="_blank" style="
-                                display:inline-block;
-                                margin-top:8px;
-                                padding:8px 10px;
-                                background:#FF4B4B;
-                                color:white;
-                                border-radius:8px;
-                                font-family:'Courier Prime', monospace;
-                                font-size:13px;
-                                font-weight:700;
-                                text-decoration:none;
-                                box-shadow:0 3px 6px rgba(0,0,0,0.25);
-                                ">▶ Trailer</a>
-                            """
-                        else:
-                            trailer_html = """
-                                <div style="font-size:12px;color:#666;margin-top:8px;">
-                                No trailer 🎬
+                            raw_html = f"""
+                                <div class="card">
+                                    <a href="{trailer}" target="_blank" class="card-link">
+                                        <img src="{poster}" alt="{title}" class="card-img">
+                                        <span class="trailer-btn trailer-active">▶ Trailer</span>
+                                    </a>
+                                    <div class="caption">{title}</div>
                                 </div>
                             """
-
-                        card_html = f"""
-                            <div class="card">
-                                <img src="{poster}" alt="{title}">
-                                <div class="caption">{title}</div>
-                                {trailer_html}
-                            </div>
-                        """
-
+                        else: # ko có trailer
+                            raw_html = f"""
+                                <div class="card">
+                                    <div class="card-link no-link-wrapper">
+                                        <img src="{poster}" alt="{title}" class="card-img">
+                                        <span class="trailer-btn no-trailer-active">⊘ No trailer</span>
+                                    </div>
+                                    <div class="caption">{title}</div>
+                                </div>
+                            """
+                        card_html = textwrap.dedent(raw_html)
                         st.markdown(card_html, unsafe_allow_html=True)
+
+
