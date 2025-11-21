@@ -340,7 +340,7 @@ if run:
 
         with col_center:
             st.markdown('<div style="margin-top: 10px;"></div>', unsafe_allow_html=True)
-            center_path = "../images/POINTING.gif"
+            center_path = BASE_DIR / "images" / "POINTING.gif"
             try:
                 # Dùng use_container_width=True để GIF lấp đầy cột giữa (kích thước 1)
                 st.image(center_path, use_container_width=True)
@@ -349,7 +349,7 @@ if run:
 
         with col_left:
             st.markdown('<div style="height: 49px;"></div>', unsafe_allow_html=True)
-            left_path = "../images/REC.png"
+            left_path = BASE_DIR / "images" / "REC.png"
             try:
                 st.image(left_path, width=550) 
             except FileNotFoundError:
@@ -357,7 +357,7 @@ if run:
 
         with col_right:
             st.markdown('<div style="height: 30px;"></div>', unsafe_allow_html=True)
-            right_path = "../images/MOV.png"
+            right_path = BASE_DIR / "images" / "MOV.png"
             try:
                 st.image(right_path, width=550) 
             except FileNotFoundError:
