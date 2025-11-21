@@ -1,319 +1,392 @@
 import streamlit as st
 import pandas as pd
 import requests
+import base64
 from pathlib import Path
-import ast
-import numpy as np
-from collections import Counter
-import math
 
-# ===================== PATH & KEYS ======================
-LOGO_PATH = Path("images/LOGO.jpg")
-MOVIES_CSV  = "data/tmdb_5000_movies.csv"
-CREDITS_CSV = "data/tmdb_5000_credits.csv"
+#Title
+st.set_page_config(page_title="Movie Analytic & Recommendation", page_icon="🎬", layout="wide")
 
-TMDB_API_KEY = "32be515044e4f084aa5b020364d6e780"
 
-# ===================== PAGE CONFIG ======================
-st.set_page_config(page_title="RCM • Movie Recommender", layout="wide")
+#Background
+image_path = Path.cwd() / "images" / "BG.jpg"
+with open(image_path, "rb") as image_file:
+    encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+image_url = f"data:image/jpeg;base64,{encoded_image}"
 
-# ===================== FONTS + THEME CSS =================
+#Add styles(CSS)
 st.markdown("""
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baskervville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
 
-<style>
-:root{
-  --bg:#FCFAF5; --ink:#1A1A1A; --lime:#D8FF84; --pink:#FFD6E0; --blue:#D6EFFF;
-}
-.block-container{ max-width:1400px; padding-top:12px; }
-[data-testid="stAppViewContainer"]{ background:var(--bg); }
+    <style>
+    /* Root & Layout */
+    :root{ --ink:#1A1A1A; --lime:#D8FF84; --pink:#FFD6E0; --blue:#D6EFFF; }
 
-/* Header */
-.header-wrap{ display:flex; align-items:center; justify-content:space-between; gap:24px; }
-.brand{ display:flex; align-items:center; gap:18px; }
+    [data-testid="stAppViewContainer"]{
+        background: transparent !important;
+    }
 
-/* Buttons */
-.top-cta{
-  display:flex; justify-content:center; gap:28px;
-  margin:10px 0 6px;
-}
-.btn-pill{
-  display:inline-flex; align-items:center; justify-content:center;
-  height:56px; min-width:260px; padding:0 22px;
-  border:3px solid var(--ink); border-radius:16px; background:var(--lime);
-  color:var(--ink); font-family:'Courier Prime',monospace; font-weight:700; font-size:18px;
-  box-shadow:8px 8px 12px 2px var(--pink); text-decoration:none; transition:transform .15s ease;
-}
-.btn-pill:hover{ transform:scale(1.03); background:#E8FF9A; }
+    .block-container{
+        max-width:1400px;
+        padding-top:80px;
+    }
+    
+    /* Subtitle Box */
+    .subtitle-box{
+        font-family:'Baskervville', cursive;
+        font-size:40px;
+        text-align:center;
+        color:#1A1A1A;
+        margin-top:20px;
+    }
 
-/* Title */
-h1.hero{
-  text-align:center; margin:12px 0 14px;
-  font-family:'Baskervville',serif; font-weight:700; font-size:44px; color:var(--ink);
-}
-.hero .hi{ background:var(--pink); padding:0 8px; border-radius:6px; }
+    .highlight{
+        background-color:#FFD6E0;
+        padding:4px 10px;
+        border-radius:6px;
+    }
 
-/* Inputs */
-div[data-baseweb="select"]{ border:3px solid var(--ink); border-radius:16px; }
-.stSelectbox > div > div{ height:60px; }
-.stSelectbox label{ display:none; }
+    /* Typography */
+    body, .stApp{
+        background-color:var(--bg);
+        color:var(--ink);
+        font-family:'Georgia', serif;
+    }
 
-div[data-testid="stVerticalBlock"] button{
-  height:60px; border:3px solid var(--ink); border-radius:16px; background:var(--lime);
-  color:var(--ink); font-family:'Courier Prime',monospace; font-weight:700;
-  box-shadow:5px 5px 10px 1px var(--pink); transition:transform .15s ease;
-}
-div[data-testid="stVerticalBlock"] button:hover{ transform:scale(1.03); }
+    h1, h2, h3{
+        font-family:'Baskervville', cursive, sans-serif;
+        font-weight:bold;
+    }
 
-/* Gallery */
-.gallery-title{
-  text-align:center; font-family:'Courier Prime',monospace; font-weight:700;
-  font-size:26px; margin:10px 0 18px; color:var(--ink);
-}
-.card{ text-align:center; }
-.card img{
-  height:350px; width:auto; border-radius:16px; box-shadow:0 6px 12px rgba(0,0,0,.25);
-  display:block; margin:0 auto;
-}
-.card .caption{
-  margin-top:12px; font-family:'Courier Prime',monospace; font-weight:700; font-size:14px;
-  letter-spacing:.3px; color:var(--ink); text-transform:uppercase;
-}
-</style>
+    /* File Uploader */
+    div[data-testid="stFileUploader"]{
+        background-color:var(--blue) !important;
+        border-radius:12px !important;
+        border:2px solid var(--ink) !important;
+        padding:12px !important;
+        font-family:'Courier Prime', monospace;
+    }
+    div[data-testid="stFileUploader"] *{
+        background-color:transparent !important;
+    }
+
+    /* Textarea */
+    div[data-testid="NoextArea"] textarea{
+        font-family:'Baskervville', cursive !important;
+        font-size:20px !important;
+        color:var(--ink) !important;
+        background-color:#FFFBEA !important;
+        border:2px solid var(--ink) !important;
+        border-radius:10px !important;
+        padding:10px !important;
+    }
+
+    /* Result Box */
+    .result-box{
+        background-color:#FFFFFF;
+        border:2px solid var(--ink);
+        border-radius:10px;
+        padding:25px 10px;
+        text-align:center;
+        font-family:'Courier Prime', monospace;
+        font-weight:800;
+        font-size:18px;
+        line-height:1.8;
+        box-shadow:4px 4px 0px var(--lime);
+        width:250px;
+        margin:0 auto;
+        position:relative;
+        top:40px;
+    }
+
+    /* Buttons */
+    div[data-testid="stVerticalBlock"] button{
+        height:65px;
+        border:3px solid var(--ink);
+        border-radius:11px;
+        background:var(--lime);
+        box-shadow:5px 5px 10px 1px var(--pink);
+        transition:transform .15s ease;
+    }
+    div[data-testid="stVerticalBlock"] button > *{
+        color:var(--ink);
+        font-family:'Courier Prime', monospace;
+        font-weight:700;
+        font-size:20px;
+    }
+    div[data-testid="stVerticalBlock"] button:hover{
+        transform:scale(1.03);
+        box-shadow:5px 5px 10px 1px var(--pink);
+    }
+    div[data-testid="stVerticalBlock"] button {
+        background-color: var(--lime) !important;
+        opacity: 1 !important;
+        backdrop-filter: none !important;
+    }
+    </style>
 """, unsafe_allow_html=True)
 
-# ===================== CUSTOM TF-IDF =====================
-class SimpleTFIDF:
-    def __init__(self):
-        self.vocab = {}
-        self.idf = {}
+st.markdown(f"""
+    <style>
+    [data-testid="stAppViewContainer"] {{
+        background: url("{image_url}") no-repeat center center fixed !important;
+        background-size: cover !important;
+    }}
 
-    def fit_transform(self, documents):
-        n_docs = len(documents)
-        doc_freq = Counter()
-
-        for doc in documents:
-            words = doc.split()
-            doc_freq.update(set(words))
-
-        self.vocab = {word: idx for idx, word in enumerate(doc_freq.keys())}
-
-        self.idf = {
-            word: math.log(n_docs / (freq + 1))
-            for word, freq in doc_freq.items()
-        }
-
-        tfidf_matrix = []
-        for doc in documents:
-            words = doc.split()
-            word_count = Counter(words)
-            length = len(words)
-            vector = [0] * len(self.vocab)
-
-            for word, count in word_count.items():
-                if word in self.vocab:
-                    tf = count / length
-                    vector[self.vocab[word]] = tf * self.idf[word]
-
-            tfidf_matrix.append(vector)
-
-        return np.array(tfidf_matrix)
-
-
-# ===================== CUSTOM COSINE =====================
-def cosine_similarity_manual(v1, v2):
-    dot = np.dot(v1, v2)
-    n1 = np.linalg.norm(v1)
-    n2 = np.linalg.norm(v2)
-    if n1 == 0 or n2 == 0:
-        return 0
-    return dot / (n1 * n2)
-
-def compute_cosine_similarity_matrix(matrix):
-    n = matrix.shape[0]
-    sim = np.zeros((n, n))
-    for i in range(n):
-        for j in range(n):
-            sim[i][j] = cosine_similarity_manual(matrix[i], matrix[j])
-    return sim
-
-# ===================== LOAD DATA (FIXED) =====================
-@st.cache_resource
-def load_data():
-    movies = pd.read_csv(MOVIES_CSV)
-    credits = pd.read_csv(CREDITS_CSV)
-
-    df = movies.merge(credits, on="title")
-
-    def convert(obj):
-        return [i["name"] for i in ast.literal_eval(obj)]
-
-    df["genres"] = df["genres"].apply(convert)
-    df["keywords"] = df["keywords"].apply(convert)
-
-    def convert_cast(obj):
-        L = []
-        for i in ast.literal_eval(obj):
-            if len(L) < 3:
-                L.append(i["name"])
-        return L
-
-    df["cast"] = df["cast"].apply(convert_cast)
-
-    def get_director(obj):
-        for i in ast.literal_eval(obj):
-            if i["job"] == "Director":
-                return i["name"]
-        return ""
-
-    df["crew"] = df["crew"].apply(lambda x: [get_director(x)])
-
-    df["tags"] = df["genres"] + df["keywords"] + df["cast"] + df["crew"]
-    df["tags"] = df["tags"].apply(lambda x: " ".join(x))
-
-    df = df[["movie_id", "title", "tags"]]
-
-    tfidf = SimpleTFIDF()
-    matrix = tfidf.fit_transform(df["tags"].tolist())
-
-    similarity = compute_cosine_similarity_matrix(matrix)
-    all_titles = df["title"].tolist()   # FIX
-
-    return df.reset_index(drop=True), similarity, all_titles
-
-# === ACTUALLY LOAD DATA HERE ===
-movies, similarity, all_titles = load_data()
-
-
-# ===================== TMDB FETCH ======================
-def fetch_poster(movie_id):
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
-    data = requests.get(url).json()
-    p = data.get("poster_path")
-    return f"https://image.tmdb.org/t/p/w500{p}" if p else None
-
-def fetch_trailer(movie_id):
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}/videos?api_key={TMDB_API_KEY}"
-    data = requests.get(url).json()
-    for v in data.get("results", []):
-        if v.get("type") == "Trailer" and v.get("site") == "YouTube":
-            return f"https://www.youtube.com/watch?v={v.get('key')}"
-    return None
-
-
-# ===================== RECOMMENDER (FIXED) =====================
-def recommend(title, top_k=10):
-    index = movies[movies["title"] == title].index[0]
-    distances = sorted(
-        list(enumerate(similarity[index])),
-        reverse=True,
-        key=lambda x: x[1]
-    )
-    picks = []
-    for i, _score in distances[1: top_k + 1]:
-        row = movies.iloc[i]
-        picks.append((row["title"], row["movie_id"]))
-    return picks
-
-
-# ===================== UI START =====================
-st.markdown('<div class="header-wrap">', unsafe_allow_html=True)
-st.markdown('<div class="brand">', unsafe_allow_html=True)
-
-if LOGO_PATH.exists():
-    st.image(str(LOGO_PATH), width=140)
-
-st.markdown('</div></div>', unsafe_allow_html=True)
-
-col1, col2 = st.columns([2, 2])
-st.markdown("""
-<style>
-div[data-testid="stButton"] > button {
-    background-color:#D8FF84;
-    border:3px solid #1A1A1A;
-    border-radius:12px;
-    padding:12px 20px;
-    font-family:'Courier Prime', monospace;
-    font-weight:700;
-    font-size:24px;
-    box-shadow:6px 6px 0px #FFD6E0;
-    color:#1A1A1A;
-}
-div[data-testid="stButton"] > button:hover {
-    background-color:#E8FF9A;
-}
-</style>
+    [data-testid="stHeader"] {{
+        background: rgba(0,0,0,0) !important;
+    }}
+    </style>
 """, unsafe_allow_html=True)
 
+#Alerts
+def show_alert(message: str, kind: str = "info"):
+    #Colors
+    colors = {
+        "info": "#e8f4fd",
+        "success": "#e6f4ea",
+        "warning": "#fff4e5",
+        "error": "#fdecea"
+    }
+    color = colors.get(kind.lower(), "#e8f4fd")
+
+    # HTML alert
+    alert_html = f"""
+    <div style="
+        position: relative;
+        padding: 16px;
+        margin: 12px 0;
+        border-radius: 8px;
+        background-color: {color};
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        z-index: 9999;
+        isolation: isolate;
+        font-weight: 500;
+        font-size: 18px;
+    ">
+        {message}
+    </div>
+    """
+    st.markdown(alert_html, unsafe_allow_html=True)
+
+#Navigation
+col_img, col1, col2 = st.columns([2, 2, 2])
+with col_img:
+    logo_path = Path.cwd() / "images" / "LOGO.png"
+    st.image(str(logo_path), width=300)
 with col1:
     if st.button("Homepage", use_container_width=True):
-        st.switch_page("homepage.py")
+        st.switch_page("homepage.py")            
 
 with col2:
-    if st.button("Analyze Movies", use_container_width=True):
-        st.switch_page("pages/review.py")
+    if st.button("Movies Recommendations", use_container_width=True):
+        st.switch_page("pages/recommendations.py") 
 
-st.markdown('<h1 class="hero">Your <span class="hi">next</span> movie</h1>', unsafe_allow_html=True)
+st.markdown("""
+<div class="subtitle-box">
+    Help you <span class="highlight">Analyze</span> your movies
+</div>
+""", unsafe_allow_html=True)
 
-# ===================== INPUT =====================
-c1, cbtn, _ = st.columns([6, 2, 1])
+st.markdown("   ")
 
-with c1:
-    selected = st.selectbox("", all_titles, index=0)
+#API
+API_URL = "https://review-sentiment-app.onrender.com/predict"
 
-with cbtn:
-    run = st.button("Recommend", use_container_width=True)
+#Input raw text & upload file
+left, center, right = st.columns([1, 6, 1])
+with center:
+    col3, col4 = st.columns([2, 1])
+    with col3:
+        st.markdown("<div style='font-family:Courier prime, cursive; font-size:30px;'>Write your movie review here</div>", unsafe_allow_html=True)
+        raw_text = st.text_area("", placeholder="Text area...", height=250)
+    with col4:
+        st.markdown("<div style='font-family:Courier prime, cursive; font-size:30px;'>Upload your review file here</div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
+        uploaded_file = st.file_uploader("", type=["csv"])
 
+#Data process, Data preview display
+df = pd.DataFrame()
 
-# ===================== RESULTS =====================
-if run:
-    recs = recommend(selected, top_k=10)
+left, center, right = st.columns([1, 6, 1])
+with center:
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file)
+        df_preview = df.copy()
+        df_preview = df_preview.loc[:, ~df_preview.columns.str.contains('^No$|^Unnamed')]
+        st.write("#### Data preview")
+        st.dataframe(df_preview.head(), hide_index=True)
 
-    if not recs:
-        st.warning("No recommendation found.")
-    else:
-        st.markdown('<div class="gallery-title">Recommended movies:</div>', unsafe_allow_html=True)
-        rows = [recs[:5], recs[5:10]]
+    elif raw_text:
+        lines = raw_text.strip().split('\n')
+        df = pd.DataFrame({"Review": lines})
+        st.write("#### Your review:")
+        st.dataframe(df, hide_index=True)
+    Analyze = st.button(label = "Analyze")
 
-        for row in rows:
-            cols = st.columns(5, gap="large")
-            for col, (title, mid) in zip(cols, row):
-                with col:
-                    poster = fetch_poster(int(mid))
-                    trailer = fetch_trailer(int(mid))
-
-                    if poster:
-                        if trailer:
-                            trailer_html = f"""
-                                <a href="{trailer}" target="_blank" style="
-                                display:inline-block;
-                                margin-top:8px;
-                                padding:8px 10px;
-                                background:#FF4B4B;
-                                color:white;
-                                border-radius:8px;
-                                font-family:'Courier Prime', monospace;
-                                font-size:13px;
-                                font-weight:700;
-                                text-decoration:none;
-                                box-shadow:0 3px 6px rgba(0,0,0,0.25);
-                                ">▶ Trailer</a>
-                            """
-                        else:
-                            trailer_html = """
-                                <div style="font-size:12px;color:#666;margin-top:8px;">
-                                No trailer 🎬
+#Send Data to API
+alert_placeholder = st.empty()
+if Analyze:
+    #If user import text
+    if raw_text and uploaded_file is None:
+        lines = raw_text.strip().split('\n')
+        lines = [line for line in lines if line.strip()]
+        input_data = {"text": lines}
+        
+        with alert_placeholder:
+            left, center, right = st.columns([1, 6, 1])
+            with center:
+                show_alert(f"⏳ Sending data to API... please wait a moment.", kind="info")
+        try:
+            result = requests.post(API_URL, json=input_data)
+            response_json = result.json()
+            alert_placeholder.empty()
+            
+            if isinstance(response_json, list) and len(response_json) > 0:
+                #Convert list dict to DataFrame
+                first_result = pd.DataFrame(response_json)
+                first_result.reset_index(inplace=True)
+                first_result.rename(columns={"index": "No"}, inplace=True)
+                first_result["No"] = first_result["No"] + 1
+                #Results Display
+                if "pred" in first_result.columns:
+                    counts = first_result["pred"].str.lower().value_counts(dropna=False)
+                    pos = int(counts.get("positive", 0))
+                    neg = int(counts.get("negative", 0))
+            
+                    total = len(first_result)
+                    pos_rate = pos / total if total else 0.0
+                    neg_rate = neg / total if total else 0.0
+                left, center, right = st.columns([1, 6, 1])
+                with center:
+                    show_alert(f"✅ Analyzis successful!", kind="success")
+                    st.markdown("### Results Table")
+                    col5, col6 = st.columns([2, 1])
+                    with col5:
+                        st.dataframe(first_result[["No", "review", "pred", "score"]], hide_index=True)
+                    with col6:
+                        like = Path.cwd() / "images" / "LIKE.gif"
+                        disklike = Path.cwd() / "images" / "DISLIKE.gif"
+                        if pos_rate >= 0.5:
+                            st.markdown(
+                                f"""
+                                <div style="text-align:center;">
+                                    <img src="data:image/gif;base64,{base64.b64encode(open(like, "rb").read()).decode()}" width="200">
                                 </div>
-                            """
-
-                        card_html = f"""
-                            <div class="card">
-                                <img src="{poster}" alt="{title}">
-                                <div class="caption">{title}</div>
-                                {trailer_html}
+                                """,
+                                unsafe_allow_html=True
+                            )
+                        else:
+                            st.markdown(
+                                f"""
+                                <div style="text-align:center;">
+                                    <img src="data:image/gif;base64,{base64.b64encode(open(disklike, "rb").read()).decode()}" width="200">
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
+                        st.markdown(
+                            f"""
+                            <div class="result-box">
+                                POSITIVE: {pos} ({pos_rate:.1%})<br>
+                                NEGATIVE: {neg} ({neg_rate:.1%})
                             </div>
-                        """
+                            """,
+                            unsafe_allow_html=True
+                        )
+            else:
+                left, center, right = st.columns([1, 6, 1])
+                with center:
+                    show_alert(f"⚠️ API returned invalid format.", kind="warning")
+        except Exception as e:
+            left, center, right = st.columns([1, 6, 1])
+            with center:
+                show_alert(f"🚫 API connection error: {e}", kind="error")
 
-                        st.markdown(card_html, unsafe_allow_html=True)
+    #If user import file
+    elif uploaded_file is not None:
+        try:
+            #Assume the first column contains reviews
+            text_col = df.columns[1] if len(df.columns) > 1 else df.columns[0]
+            texts = df[text_col].astype(str).tolist()
+
+            input_data = {"text": texts}
+            with alert_placeholder:
+                left, center, right = st.columns([1, 6, 1])
+                with center:
+                    show_alert(f"⏳ Sending data to API... please wait a moment.", kind="info")
+            result = requests.post(API_URL, json=input_data, timeout=60)
+            response_json = result.json()
+            alert_placeholder.empty()
+
+            if isinstance(response_json, list):
+                #Convert list dict to DataFrame
+                df_result = pd.DataFrame(response_json)
+                df_result.reset_index(inplace=True)
+                df_result.rename(columns={"index": "No"}, inplace=True)
+                df_result["No"] = df_result["No"] + 1
+
+                #Results Display
+                left, center, right = st.columns([1, 6, 1])
+                with center:
+                    show_alert(f"✅ Analyzis successful!", kind="success")
+                if "pred" in df_result.columns:
+                    counts = df_result["pred"].str.lower().value_counts(dropna=False)
+                    pos = int(counts.get("positive", 0))
+                    neg = int(counts.get("negative", 0))
+            
+                    total = len(df_result)
+                    pos_rate = pos / total if total else 0.0
+                    neg_rate = neg / total if total else 0.0
+        
+
+                left, center, right = st.columns([1, 6, 1])
+                with center:
+                    st.markdown("### Results Table")
+                left, center, right = st.columns([1, 6, 1])
+                with center:
+                    col7, col8 = st.columns([2, 1])
+                    with col7:
+                        st.dataframe(df_result[["No", "review", "pred", "score"]], hide_index=True)
+
+                    with col8:
+                        like = Path.cwd() / "images" / "LIKE.gif"
+                        disklike = Path.cwd() / "images" / "DISLIKE.gif"
+                        if pos_rate >= 0.5:
+                            st.markdown(
+                                f"""
+                                <div style="text-align:center;">
+                                    <img src="data:image/gif;base64,{base64.b64encode(open(like, "rb").read()).decode()}" width="200">
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
+                        else:
+                            st.markdown(
+                                f"""
+                                <div style="text-align:center;">
+                                    <img src="data:image/gif;base64,{base64.b64encode(open(disklike, "rb").read()).decode()}" width="200">
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
+                        st.markdown(
+                            f"""
+                            <div class="result-box">
+                                POSITIVE: {pos} ({pos_rate:.1%})<br>
+                                NEGATIVE: {neg} ({neg_rate:.1%})
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+            else:
+                left, center, right = st.columns([1, 6, 1])
+                with center:
+                    show_alert(f"⚠️ API returned invalid format.", kind="warning")
+        except Exception as e:
+            left, center, right = st.columns([1, 6, 1])
+            with center:
+                show_alert(f"🚫 API connection error: {e}", kind="error")
