@@ -79,73 +79,15 @@ div[data-testid="stVerticalBlock"] button:hover{ transform:scale(1.03); }
 </style>
 """, unsafe_allow_html=True)
 
-import ast
-import numpy as np
-from collections import Counter
-import math
-
-# ===================== CUSTOM TF-IDF =====================
-class SimpleTFIDF:
-    def __init__(self):
-        self.vocab = {}
-        self.idf = {}
-
-    def fit_transform(self, documents):
-        n_docs = len(documents)
-        doc_freq = Counter()
-
-        # Document frequency (DF)
-        for doc in documents:
-            words = doc.split()
-            doc_freq.update(set(words))
-
-        # Vocab
-        self.vocab = {word: idx for idx, word in enumerate(doc_freq.keys())}
-
-        # IDF
-        self.idf = {
-            word: math.log(n_docs / (freq + 1))
-            for word, freq in doc_freq.items()
-        }
-
-        # TF-IDF matrix
-        tfidf_matrix = []
-        for doc in documents:
-            words = doc.split()
-            word_count = Counter(words)
-            length = len(words)
-
-            vector = [0] * len(self.vocab)
-            for word, count in word_count.items():
-                if word in self.vocab:
-                    tf = count / length
-                    vector[self.vocab[word]] = tf * self.idf[word]
-
-            tfidf_matrix.append(vector)
-
-        return np.array(tfidf_matrix)
-
-
-# ===================== CUSTOM COSINE =====================
-def cosine_similarity_manual(v1, v2):
-    dot = np.dot(v1, v2)
-    n1 = np.linalg.norm(v1)
-    n2 = np.linalg.norm(v2)
-    if n1 == 0 or n2 == 0:
-        return 0
-    return dot / (n1 * n2)
-
-def compute_cosine_similarity_matrix(matrix):
-    n = matrix.shape[0]
-    sim = np.zeros((n, n))
-    for i in range(n):
-        for j in range(n):
-            sim[i][j] = cosine_similarity_manual(matrix[i], matrix[j])
-    return sim
 
 # ===================== TMDB POSTER ======================
 @st.cache_resource
 def load_data():
+    import ast
+    import numpy as np
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+
     movies = pd.read_csv(MOVIES_CSV)
     credits = pd.read_csv(CREDITS_CSV)
 
@@ -176,23 +118,21 @@ def load_data():
             if i["job"] == "Director":
                 return i["name"]
         return ""
-
+        
     df["crew"] = df["crew"].apply(lambda x: [get_director(x)])
 
-    # build TAGS
     df["tags"] = df["genres"] + df["keywords"] + df["cast"] + df["crew"]
     df["tags"] = df["tags"].apply(lambda x: " ".join(x))
+    df = df[["movie_id","title","tags"]]
 
-    df = df[["movie_id", "title", "tags"]]
+    tfidf = TfidfVectorizer(stop_words="english")
+    vectors = tfidf.fit_transform(df["tags"])
+    similarity = cosine_similarity(vectors)
 
-    # ============= CUSTOM TF-IDF =============
-    tfidf = SimpleTFIDF()
-    matrix = tfidf.fit_transform(df["tags"].tolist())
+    return df.reset_index(drop=True), similarity
 
-    # ============= CUSTOM COSINE =============
-    similarity = compute_cosine_similarity_matrix(matrix)
-    all_titles = movies['title'].tolist()
-    return df.reset_index(drop=True), similarity, all_titles
+movies, similarity = load_data()
+all_titles = movies["title"].tolist()
 
 def fetch_poster(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}"
