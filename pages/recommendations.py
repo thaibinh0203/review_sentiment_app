@@ -12,7 +12,6 @@ from collections import Counter
 import math
 
 # Đọc dữ liệu
-LOGO_PATH = Path("images/LOGO.jpg")
 MOVIES_CSV  = "data/tmdb_5000_movies.csv"
 CREDITS_CSV = "data/tmdb_5000_credits.csv"
 
