@@ -12,8 +12,9 @@ from collections import Counter
 import math
 
 # Đọc dữ liệu
-credits = pd.read_csv('tmdb_5000_credits.csv')
-movies = pd.read_csv('tmdb_5000_movies.csv')
+LOGO_PATH = Path("images/LOGO.jpg")
+MOVIES_CSV  = "data/tmdb_5000_movies.csv"
+CREDITS_CSV = "data/tmdb_5000_credits.csv"
 
 # Merge 2 dataset
 movies = movies.merge(credits, left_on='title', right_on='title')
