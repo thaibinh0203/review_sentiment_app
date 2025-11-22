@@ -5,7 +5,7 @@ import base64
 from pathlib import Path
 
 #Title
-st.set_page_config(page_title="Movie Analytic & Recommendation", page_icon="🎬", layout="wide")
+st.set_page_config(page_title="Movie Analytic & Recommendation", layout="wide")
 
 
 #Background
